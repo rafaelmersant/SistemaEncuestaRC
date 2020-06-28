@@ -1,6 +1,7 @@
 ﻿body {
-    padding-top: 50px;
+    padding-top: 0;
     padding-bottom: 20px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -21,4 +22,19 @@ input,
 select,
 textarea {
     max-width: 280px;
+}
+
+.center-block {
+    display: table; /* Instead of display:block */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.panel-custom {
+    height: 43px;
+    padding-right: 5px;
+    padding-left: 5px;
+    padding-top: 5px;
+    border: 1px solid #ededed;
+    border-radius: 2px;
 }

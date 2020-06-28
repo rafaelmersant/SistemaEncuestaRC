@@ -3,37 +3,70 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - RadioCentro</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/content/font-awesome/css/font-awesome.min.css")
+
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+
+    <nav class="navbar navbar-expand-lg navbar-light mb-5 border-bottom shadow-sm">
+        <div class="container-fluid">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                <img src="~/Content/images/RCLogo.PNG" alt="RC" class="navbar-brand" width="229" style="margin-top: -8px" />
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+
+                <ul class="navbar-nav">
+                    @*@if (Session["role"] != null && Session["role"].ToString() == "Admin")
+                    {*@
+                        <li class="nav-item"><a href="/encuesta/main" class="nav-link">Encuestas</a></li>
+                        <li class="nav-item"><a href="/encuesta/preguntas" class="nav-link">Preguntas</a></li>
+                        <li class="nav-item"><a href="/encuesta/respuestas" class="nav-link">Respuestas</a></li>
+                        <li class="nav-item"><a href="/user/UsersList" class="nav-link">Usuarios</a></li>
+                    @*}
+                    else
+                    {
+                        <li class="nav-item"><a href="/encuestas/consultar" class="nav-link">Consulta Volante</a></li>
+                    }*@
+
+                </ul>
+
+                <ul class="nav navbar-nav" style="position: absolute; right:10px">
+                    @*<li class="nav-item">@Html.ActionLink("Usuarios", "Users", "User", new { @class = "nav-link" }) </li>*@
+
+                    @if (Session["role"] != null)
+                    {
+                        <li class="nav-item"><a href="/user/logout" class="nav-link">Cerrar Sesión</a></li>
+                        <li class="nav-item"><a href="user/ChangePassword" class="nav-link"><span class="mr-2">|</span> @Session["email"]</a>  </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item"><a href="/user/login" class="nav-link"></a>Iniciar Sesión</li>
+                    }
+
                 </ul>
             </div>
         </div>
-    </div>
+    </nav>
+
+    @Scripts.Render("~/content/jquery/dist/jquery.min.js")
+    @*@Scripts.Render("~/Scripts/fontawesome/fontawesome.min.js")*@
+
+
     <div class="container body-content">
         @RenderBody()
-        <hr />
+
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            @*<p>&copy; @DateTime.Now.Year - RadioCentro</p>*@
         </footer>
     </div>
+
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
