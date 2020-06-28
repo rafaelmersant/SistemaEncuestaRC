@@ -1,0 +1,89 @@
+﻿@model EncuestasRCEntities.Models.User
+
+@{
+    ViewBag.Title = "Editar usuario";
+}
+
+<div class="container col-7 shadow p-3 mb-5 bg-white rounded">
+    <h3 class="bg-secondary text-light pl-2 pr-2">Editar Usuario</h3>
+    <div class="col-12 pb-3 pt-3 bg-light">
+        @using (Html.BeginForm(null, null, FormMethod.Post,
+                         new { id = "EditUser" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.IdHash)
+            <div class="form-row">
+                <div class="col-4 mb-3">
+                    <label for="validationDefault01">Código de Empleado</label>
+                    @Html.EditorFor(model => model.EmployeeID, new { htmlAttributes = new { @class = "form-control numericOnly" } })
+                    @Html.ValidationMessageFor(model => model.EmployeeID, "", new { @class = "text-danger" })
+                </div>
+                @*<div class="col-8 mb-3">
+                    <label for="validationDefault02">Cédula</label>
+                    @Html.EditorFor(model => model.Identification, new { htmlAttributes = new { @class = "form-control col-12 numericOnly" } })
+                    @Html.ValidationMessageFor(model => model.Identification, "", new { @class = "text-danger" })
+                </div>*@
+            </div>
+            <div class="form-row">
+                <div class="col-4">
+                    <label for="validationDefault02">Rol</label>
+                    @Html.DropDownListFor(m => m.Role, new SelectList(ViewBag.Roles, "Value", "Text"), new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.Role)
+                </div>
+
+
+                <div class="col-8 mb-3">
+                    <label for="validationDefaultUsername">Correo</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="idEmailDeco">@@</span>
+                        </div>
+                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control col-12" } })
+                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="form-row" style="display: none">
+                <div class="col-4 mb-4">
+                    <label for="validationDefault02">Contraseña</label>
+                    @Html.HiddenFor(model => model.PasswordHash)
+                    @*@Html.EditorFor(model => model.PasswordHash, new { htmlAttributes = new { @class = "form-control col-12", @type = "password", @disabled = "disabled" } })
+                        @Html.ValidationMessageFor(model => model.PasswordHash, "", new { @class = "text-danger" })*@
+                </div>
+
+                <div class="col-8 mb-4">
+                    <label for="validationDefault02">Nueva Contraseña</label>
+                    <input type="password" name="newPassword" id="newPassword" value="" class="form-control" />
+                </div>
+
+            </div>
+
+            <button class="btn btn-danger w-100 mt-4" type="submit">
+                Guardar cambios
+            </button>
+
+            <span class="d-block bg-light text-@ViewBag.Result pl-2 pr-2 pb-1 pt-1 mt-3 mb-0 text-center">@ViewBag.Message</span>
+
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $(".numericOnly").keypress(function (e) {
+            if (String.fromCharCode(e.keyCode).match(/[^0-9]/g))  return false;
+        });
+
+        $("#EmployeeID").keypress(function () {
+            if (this.value.length >= 4)
+                return false;
+        });
+    });
+
+</script>

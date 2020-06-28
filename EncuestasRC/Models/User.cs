@@ -18,7 +18,6 @@ namespace EncuestasRC.Models
         public System.Guid IdHash { get; set; }
         public string EmployeeID { get; set; }
         public string PasswordHash { get; set; }
-        public string Identification { get; set; }
         public string Role { get; set; }
         public string Email { get; set; }
         public System.DateTime CreatedDate { get; set; }

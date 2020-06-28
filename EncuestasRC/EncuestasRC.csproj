@@ -197,6 +197,9 @@
     <Compile Include="Models\Question.cs">
       <DependentUpon>EncuestaRC.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\QuestionType.cs">
+      <DependentUpon>EncuestaRC.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Survey.cs">
       <DependentUpon>EncuestaRC.tt</DependentUpon>
     </Compile>
@@ -206,6 +209,7 @@
     <Compile Include="Models\User.cs">
       <DependentUpon>EncuestaRC.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\UserMetadata.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -367,6 +371,10 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\User\Login.cshtml" />
+    <Content Include="Views\User\ChangePassword.cshtml" />
+    <Content Include="Views\User\UsersList.cshtml" />
+    <Content Include="Views\User\RegisterUser.cshtml" />
+    <Content Include="Views\User\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -114,17 +114,12 @@ namespace EncuestasRC.Controllers
                         var _userEmployeeId = users.FirstOrDefault(u => u.EmployeeID == user.EmployeeID);
                         if (_userEmployeeId != null) throw new Exception("Este código de empleado ya existe en el sistema.");
 
-                        //This Identification exists ?
-                        var _userIdentification = users.FirstOrDefault(u => u.Identification == user.Identification);
-                        if (_userIdentification != null) throw new Exception("Esta cédula ya esta registrada a un usuario del sistema.");
-
                         var newUser = new User
                         {
                             CreatedDate = DateTime.Now,
                             IdHash = Guid.NewGuid(),
                             Email = user.Email,
                             EmployeeID = user.EmployeeID,
-                            Identification = user.Identification,
                             PasswordHash = Helper.SHA256(user.PasswordHash),
                             Role = user.Role
                         };
@@ -195,11 +190,6 @@ namespace EncuestasRC.Controllers
                             var _userEmployeeId = users.FirstOrDefault(u => u.EmployeeID == _user.EmployeeID);
                             if (_userEmployeeId != null && user_edit.EmployeeID != _user.EmployeeID) throw new Exception("Este código de empleado ya existe en el sistema.");
 
-                            //This Identification exists ?
-                            var _userIdentification = users.FirstOrDefault(u => u.Identification == _user.Identification);
-                            if (_userIdentification != null && user_edit.Identification != _user.Identification) throw new Exception("Esta cédula ya esta registrada a un usuario del sistema.");
-
-                            user_edit.Identification = _user.Identification;
                             user_edit.Role = _user.Role;
                             user_edit.Email = _user.Email;
                             user_edit.EmployeeID = _user.EmployeeID;
@@ -265,22 +255,15 @@ namespace EncuestasRC.Controllers
         }
 
         [HttpPost]
-        public JsonResult RecoverPassword(string employeeId, string email, string identification)
+        public JsonResult RecoverPassword(string employeeId, string email)
         {
             try
             {
                 using (var db = new EncuestaRCEntities())
                 {
                     //This EmployeeId exists ?
-                    var _userEmployeeId = db.Users.FirstOrDefault(u => u.EmployeeID == employeeId);
-                    if (_userEmployeeId == null) throw new Exception("Este código de empleado no fue encontrado.");
-
-                    //This Identification exists ?
-                    var _userIdentification = db.Users.FirstOrDefault(u => u.Identification == identification);
-                    if (_userIdentification == null) throw new Exception("Esta cédula no fue encontrada.");
-
-                    var _userRelationship = db.Users.FirstOrDefault(u => u.Identification == identification && u.EmployeeID == employeeId);
-                    if (_userRelationship == null) throw new Exception("Esta cédula no esta relacionada a este empleado.");
+                    var _userEmployeeId = db.Users.FirstOrDefault(u => u.EmployeeID == employeeId && u.Email == email);
+                    if (_userEmployeeId == null) throw new Exception("Este código/email de empleado no fue encontrado.");
 
                     var user_edit = db.Users.FirstOrDefault(u => u.EmployeeID == employeeId);
                     string newPassword = Environment.TickCount.ToString().Substring(0, 4);

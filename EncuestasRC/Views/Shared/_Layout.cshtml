@@ -25,9 +25,9 @@
                 <ul class="navbar-nav">
                     @*@if (Session["role"] != null && Session["role"].ToString() == "Admin")
                     {*@
-                        <li class="nav-item"><a href="/encuesta/main" class="nav-link">Encuestas</a></li>
-                        <li class="nav-item"><a href="/encuesta/preguntas" class="nav-link">Preguntas</a></li>
-                        <li class="nav-item"><a href="/encuesta/respuestas" class="nav-link">Respuestas</a></li>
+                        <li class="nav-item"><a href="/encuestas/" class="nav-link">Encuestas</a></li>
+                        <li class="nav-item"><a href="/encuestas/:id/preguntas" class="nav-link">Preguntas</a></li>
+                        <li class="nav-item"><a href="/encuestas/:id/preguntas/:id/respuestas" class="nav-link">Respuestas</a></li>
                         <li class="nav-item"><a href="/user/UsersList" class="nav-link">Usuarios</a></li>
                     @*}
                     else

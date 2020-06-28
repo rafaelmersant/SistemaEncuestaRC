@@ -11,14 +11,8 @@ namespace EncuestasRC.Controllers
     {
         public ActionResult Index()
         {
-            try
-            {
-                int b = 0;
-                int x = b;
-            }
-            catch(Exception ex) {
-                Helper.SendExceptionToSentry(ex);
-            }
+            //TEMP
+            Session["role"] = "Admin"; //TEMP
 
             return View();
         }

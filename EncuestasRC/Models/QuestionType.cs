@@ -12,17 +12,9 @@ namespace EncuestasRC.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Question
+    public partial class QuestionType
     {
         public int Id { get; set; }
-        public int SurveyId { get; set; }
-        public string Title { get; set; }
-        public Nullable<decimal> Points { get; set; }
-        public string Comments { get; set; }
-        public Nullable<int> SortIndex { get; set; }
-        public Nullable<int> TypeId { get; set; }
-        public bool Active { get; set; }
-        public System.DateTime CreateDate { get; set; }
-        public string CreateBy { get; set; }
+        public string description { get; set; }
     }
 }
