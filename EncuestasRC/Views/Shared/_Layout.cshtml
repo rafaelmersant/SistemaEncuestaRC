@@ -6,7 +6,7 @@
     <title>@ViewBag.Title - RadioCentro</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-    @Styles.Render("~/content/font-awesome/css/font-awesome.min.css")
+    @Styles.Render("~/content/font-awesome.min.css")
 
 </head>
 <body>
@@ -26,8 +26,6 @@
                     @*@if (Session["role"] != null && Session["role"].ToString() == "Admin")
                     {*@
                         <li class="nav-item"><a href="/encuestas/" class="nav-link">Encuestas</a></li>
-                        <li class="nav-item"><a href="/encuestas/:id/preguntas" class="nav-link">Preguntas</a></li>
-                        <li class="nav-item"><a href="/encuestas/:id/preguntas/:id/respuestas" class="nav-link">Respuestas</a></li>
                         <li class="nav-item"><a href="/user/UsersList" class="nav-link">Usuarios</a></li>
                     @*}
                     else
@@ -43,11 +41,11 @@
                     @if (Session["role"] != null)
                     {
                         <li class="nav-item"><a href="/user/logout" class="nav-link">Cerrar Sesión</a></li>
-                        <li class="nav-item"><a href="user/ChangePassword" class="nav-link"><span class="mr-2">|</span> @Session["email"]</a>  </li>
+                        <li class="nav-item"><a href="/user/ChangePassword" class="nav-link"><span class="mr-2">|</span> @Session["email"]</a>  </li>
                     }
                     else
                     {
-                        <li class="nav-item"><a href="/user/login" class="nav-link"></a>Iniciar Sesión</li>
+                        <li class="nav-item"><a href="/user/login" class="nav-link">Iniciar Sesión</a></li>
                     }
 
                 </ul>
@@ -55,7 +53,7 @@
         </div>
     </nav>
 
-    @Scripts.Render("~/content/jquery/dist/jquery.min.js")
+    @Scripts.Render("~/Scripts/jquery-3.3.1.min.js")
     @*@Scripts.Render("~/Scripts/fontawesome/fontawesome.min.js")*@
 
 

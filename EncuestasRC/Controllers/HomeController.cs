@@ -10,10 +10,7 @@ namespace EncuestasRC.Controllers
     public class HomeController : Controller
     {
         public ActionResult Index()
-        {
-            //TEMP
-            Session["role"] = "Admin"; //TEMP
-
+        {           
             return View();
         }
 

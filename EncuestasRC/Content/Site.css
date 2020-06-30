@@ -38,3 +38,7 @@ textarea {
     border: 1px solid #ededed;
     border-radius: 2px;
 }
+
+.table-condensed {
+    font-size: 14px;
+}

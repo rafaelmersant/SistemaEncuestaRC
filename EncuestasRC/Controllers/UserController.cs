@@ -82,7 +82,7 @@ namespace EncuestasRC.Controllers
 
             using (var db = new EncuestaRCEntities())
             {
-                var users = db.Users.ToList().OrderByDescending(o => o.CreatedDate);
+                var users = db.Users.OrderByDescending(o => o.CreatedDate).ToList();
                 return View(users);
             }
         }
@@ -279,7 +279,8 @@ namespace EncuestasRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex);
+                if (!ex.Message.Contains("/email"))
+                    Helper.SendException(ex);
 
                 return new JsonResult { Data = ex.Message, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
