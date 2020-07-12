@@ -385,7 +385,8 @@
     <Content Include="Views\User\Edit.cshtml" />
     <Content Include="Views\User\RecoverPassword.cshtml" />
     <Content Include="Views\User\UsersList.cshtml" />
-    <Content Include="Views\Survey\SurveyList.cshtml" />
+    <Content Include="Views\Survey\Index.cshtml" />
+    <Content Include="Views\Survey\New.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

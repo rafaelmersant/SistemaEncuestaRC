@@ -15,6 +15,7 @@ namespace EncuestasRC.Models
     public partial class Survey
     {
         public int Id { get; set; }
+        public string Title { get; set; }
         public int SurveyYear { get; set; }
         public int SurveyMonth { get; set; }
         public string Comments { get; set; }

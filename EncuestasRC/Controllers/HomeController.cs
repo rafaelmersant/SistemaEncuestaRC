@@ -10,7 +10,9 @@ namespace EncuestasRC.Controllers
     public class HomeController : Controller
     {
         public ActionResult Index()
-        {           
+        {
+            if (Session["role"] == null) return RedirectToAction("Login", "User");
+
             return View();
         }
 

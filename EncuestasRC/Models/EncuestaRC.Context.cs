@@ -25,12 +25,12 @@ namespace EncuestasRC.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public DbSet<Answer> Answers { get; set; }
-        public DbSet<Survey> Surveys { get; set; }
         public DbSet<SurveyHistory> SurveyHistories { get; set; }
         public DbSet<LoginHistory> LoginHistories { get; set; }
-        public DbSet<Question> Questions { get; set; }
         public DbSet<QuestionType> QuestionTypes { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Survey> Surveys { get; set; }
+        public DbSet<Answer> Answers { get; set; }
+        public DbSet<Question> Questions { get; set; }
     }
 }

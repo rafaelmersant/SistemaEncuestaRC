@@ -17,7 +17,7 @@ namespace EncuestasRC.Models
         public int Id { get; set; }
         public int SurveyId { get; set; }
         public string Title { get; set; }
-        public Nullable<decimal> Points { get; set; }
+        public Nullable<int> Points { get; set; }
         public string Comments { get; set; }
         public Nullable<int> SortIndex { get; set; }
         public Nullable<int> TypeId { get; set; }

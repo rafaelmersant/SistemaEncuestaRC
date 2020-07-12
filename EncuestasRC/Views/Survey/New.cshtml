@@ -1,0 +1,282 @@
+﻿
+@{
+    ViewBag.Title = "Nueva Encuesta";
+
+    var lastQuestion = 0;
+    var pointsAvailable = 100;
+}
+
+<div class="container col-12 shadow p-3 mb-5 bg-white rounded">
+    <h5 class="bg-dark text-light pl-2 pr-2 pt-2 pb-2 border rounded">Nueva Encuesta</h5>
+    <div class="col-12 pb-3 pt-3 bg-light">
+        @using (Html.BeginForm())
+        {
+            <input type="hidden" id="surveyId" name="surveyId" value="@ViewBag.surveyId" />
+
+            <div class="row">
+                <div class="col-11 mb-3">
+                    <label for="validationDefault01">Titulo</label>
+                    <input type="text" class="form-control col-12" id="title" autocomplete="off" value="@ViewBag.surveyTitle" required>
+                </div>
+                <div class="col-1 mb-3 text-center">
+                    <label for="validationDefault02">Activa</label>
+                    <label class="switch ">
+                        <input type="checkbox" class="primary" id="active" checked="@ViewBag.active">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="text-left">
+                <input id="btnSaveSurvey" class="btn btn-danger pl-5 pr-5" type="submit" value="Guardar">
+
+            </div>
+
+            <span id="message" class="d-block bg-light text-info pl-2 pr-2 pb-1 pt-1 mt-3 mb-0 text-center"></span>
+        }
+    </div>
+
+    @if (ViewBag.surveyId > 0)
+    {
+        <div class="panel-custom rounded pt-2 mt-2 mb-2" style="background-color: #ededed">
+            <span class="panel-title text-dark">Preguntas</span>
+
+            <div class="btn-group pull-right">
+                <button class="btn btn-danger pl-3 pr-3 pt-2 rounded-circle" style="margin-top: -7px" onclick="editQuestion(0, '', @pointsAvailable, @lastQuestion)">+</button>
+            </div>
+        </div>
+
+        <div>
+            <table id="usersTable" class="table table-striped table-bordered table-condensed table-sm">
+                <thead class="bg-dark text-light">
+                    <tr>
+                        <th class="text-center border-0">
+                            No.
+                        </th>
+                        <th class="border-0">
+                            Descripción
+                        </th>
+                        <th class="text-center border-0">
+                            Puntos
+                        </th>
+                        <th class="text-center border-0">
+                            Respuestas
+                        </th>
+                        <th class="text-center border-0" style="width:80px">
+                            Acción
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var question in ViewBag.questions)
+                    {
+                        lastQuestion = question.SortIndex > lastQuestion ? question.SortIndex + 1 : lastQuestion;
+                        pointsAvailable = pointsAvailable - question.Points;
+                    <tr>
+                        <td>@question.SortIndex</td>
+                        <td>@question.Title</td>
+                        <td class="text-center">
+                            @question.Points
+                        </td>
+                        <td align="center">
+                            <a class="btn btn-sm btn-info" href="javascript:void(0)" onclick="answers(@question.Id)">
+                                <i class="fa fa-archive"></i>
+
+                            </a>
+                        </td>
+                        <td align="center">
+                            <a class="btn btn-sm btn-success" href="javascript:void(0)" onclick="editQuestion(@question.Id, '@(question.Title)', @question.Points, @question.SortIndex)">
+                                <i class="fa fa-edit"></i>
+
+                            </a>
+                            <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteQuestion(@question.Id)">
+                                <i class="fa fa-remove"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    }
+
+    <div class="modal fade" id="questionModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark">
+                    <h5 class="modal-title text-light" id="exampleModalLongTitle">Nueva pregunta</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="font-size: 0.9em">
+                    <input type="hidden" id="questionId" name="questionId" value="0" />
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label for="validationDefault01">Pregunta</label>
+                            <input type="text" class="form-control col-12" style="font-size: 0.9em" id="questionTitle" autocomplete="off" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-2">
+                            <label for="validationDefault01">Puntos</label>
+                            <input type="number" class="form-control col-12" id="questionPoints" value="@pointsAvailable" autocomplete="off" required>
+                        </div>
+                        <div class="col-2">
+                            <label for="validationDefault01">Orden</label>
+                            <input type="number" class="form-control col-12" id="questionSortIndex" value="@lastQuestion" autocomplete="off" required>
+                        </div>
+                        @*<div class="col-2 text-left">
+                <label for="validationDefault02" class="d-block">Activa</label>
+                <div class="text-center">
+                    <label class="switch">
+                        <input type="checkbox" class="primary" id="active" checked="checked">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>*@
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" id="btnSaveQuestion" class="btn btn-danger">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script type="text/javascript">
+
+    const emailBy = (employeeId) => {
+        $.ajax({
+            "url": `/Ajax/GetEmailByEmployeeId/?employeeId=${employeeId}`,
+            "type": "GET",
+            "success": function (data) {
+                console.log(data)
+                $("#Email").val(data);
+            }
+        })
+    }
+
+    const saveSurvey = (title, active, id) => {
+        url = `/Survey/NewSurvey?title=${title}&active=${active}`
+
+        if (id > 0)
+            url = `/Survey/EditSurvey?title=${title}&active=${active}&id=${id}`;
+
+        $.ajax({
+            "url": url,
+            "type": "POST",
+            "success": function (response) {
+                if (response.result === "200") {
+                    window.location = `/survey/new/${response.message}`;
+                } else {
+                    console.log(response.message);
+                    alert('Hubo un error tratando de guardar la encuesta.');
+                }
+            }
+        });
+    }
+
+    const saveQuestion = (title, points, sortIndex, surveyId, id) => {
+        url = `/Survey/NewQuestion?title=${title}&points=${points}&sortIndex=${sortIndex}&surveyId=${surveyId}`
+
+        if (id > 0)
+            url = `/Survey/EditQuestion?title=${title}&points=${points}&sortIndex=${sortIndex}&surveyId=${surveyId}&questionId=${id}`
+
+        $.ajax({
+            "url": url,
+            "type": "POST",
+            "success": function (response) {
+                if (response.result === "200") {
+                    window.location.reload()
+                } else {
+                    console.log(response.message);
+                    alert('Hubo un error tratando de guardar la pregunta.');
+                }
+            }
+        });
+    }
+
+    const editQuestion = (id, title, points, sortIndex) => {
+
+        $("#questionId").val(id)
+        $("#questionTitle").val(title)
+        $("#questionPoints").val(points)
+        $("#questionSortIndex").val(sortIndex)
+
+        $("#questionModalCenter").modal("show")
+
+        //$.ajax({
+        //    "url": "/Survey/DeleteQuestion?id=" + id,
+        //    "type": "POST",
+        //    "success": function (response) {
+        //        if (response.result === "200") {
+        //            window.location.reload();
+        //        } else {
+        //            console.log(response.message);
+        //            alert('Hubo un error tratando de eliminar la pregunta (Contacte al administrador del sistema).');
+        //        }
+        //    }
+        //});
+    }
+
+    const deleteQuestion = (id) => {
+        if (confirm(`Seguro que desea eliminar esta pregunta?`)) {
+            $.ajax({
+                "url": "/Survey/DeleteQuestion?id=" + id,
+                "type": "POST",
+                "success": function (response) {
+                    if (response.result === "200") {
+                        window.location.reload();
+                    } else {
+                        console.log(response.message);
+                        alert('Hubo un error tratando de eliminar la pregunta (Contacte al administrador del sistema).');
+                    }
+                }
+            });
+        }
+    }
+
+    $(document).ready(function () {
+
+        $(".numericOnly").keypress(function (e) {
+            if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false
+        });
+        
+        $("#btnSaveSurvey").click(function (e) {
+            e.preventDefault()
+            $("#btnSaveSurvey").attr('disabled', 'disabled')
+
+            const id = $("#surveyId").val()
+            const title = $("#title").val()
+            const active = $("#active").prop("checked")
+
+            saveSurvey(title, active, id);
+        });
+
+        $("#btnSaveQuestion").click(function (e) {
+            e.preventDefault()
+            $("#btnSaveQuestion").attr('disabled', 'disabled')
+
+            const title = $("#questionTitle").val()
+            const points = $("#questionPoints").val()
+            const sortIndex = $("#questionSortIndex").val()
+            const surveyId = $("#surveyId").val()
+            const questionId = $("#questionId").val()
+            
+            saveQuestion(title, points, sortIndex, surveyId, questionId);
+        });
+    });
+
+
+</script>

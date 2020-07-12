@@ -17,7 +17,7 @@ namespace EncuestasRC.Models
         public int Id { get; set; }
         public int QuestionId { get; set; }
         public string Title { get; set; }
-        public decimal Points { get; set; }
+        public int Points { get; set; }
         public string Comments { get; set; }
         public bool Active { get; set; }
         public System.DateTime CreateDate { get; set; }

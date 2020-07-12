@@ -43,14 +43,20 @@ namespace EncuestasRC.App_Start
             }
         }
                
-        public static void SendException(Exception ex)
+        public static void SendException(Exception ex, string extraInfo = "")
         {
             string _sentry = ConfigurationManager.AppSettings["sentry_dsn"];
             string _environment = ConfigurationManager.AppSettings["sentry_environment"];
 
             var ravenClient = new SharpRaven.RavenClient(_sentry);
             ravenClient.Environment = _environment;
-            ravenClient.Capture(new SharpRaven.Data.SentryEvent(ex));
+
+            var exception = new SharpRaven.Data.SentryEvent(ex);
+
+            if (!string.IsNullOrEmpty(extraInfo))
+                exception.Extra = extraInfo;
+
+            ravenClient.Capture(exception);
         }
 
         public static void SendException(string message)
