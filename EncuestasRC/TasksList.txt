@@ -1,0 +1,24 @@
+﻿
+****1-Una pantalla para crear usuarios, donde se especificara el nombre de usuario, contraseña, correo y rol (administrador/usuario consulta)
+
+****2-Una pantalla para inicio de sesion donde el usuario tendra que especificar las credenciales de acceso a la aplicacion. Esta contara con un nombre de usuario y contraseña que seran provistos 
+****por un usuario administrador principal.
+
+****3-Una pantalla para crear las encuestas, preguntas y respuestas. En esta misma podra modificar/eliminar las encuestas. Tambie, si asi lo desea podra inactivar una encuesta, 
+****de manera que ya no este disponible para ser completada.
+Datos de la encuesta: Titulo, año, mes, comentario, Activa/Inactiva
+Datos de la pregunta: Titulo, puntos, comentario, Activa/Inactiva
+Datos de la respuesta: Titulo, puntos, comentario, Activa/Inactiva
+Los comentarios estaran visibles solo al momento de crear/editar las preguntas/respuestas
+
+4-Una pantalla para enviar encuestas a determinados clientes (debe digitar el/los correo(s) y seleccionar la encuesta a enviar)
+5-Una pantalla para completar/llenar las encuestas (donde respondera todas las preguntas)
+6-Una pantalla para ver el historico de encuestas (ver todas las encuestas creadas)
+7-Un reporte con Graficas (aun por definir informacion a presentar)
+8-un reporte para ver los resultados de encuestas y sus preguntas, asi como cuantos han completado la encuesta (Permitir exportar a excel)
+
+
+Tasks:
+*****1-Agregar editedBy, editedOn para Survey, Question, Answers
+*****2-Crear Modal para respuestas (listado, modificar/eliminar)
+3-

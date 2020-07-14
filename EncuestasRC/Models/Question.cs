@@ -24,5 +24,7 @@ namespace EncuestasRC.Models
         public bool Active { get; set; }
         public System.DateTime CreateDate { get; set; }
         public string CreateBy { get; set; }
+        public Nullable<System.DateTime> ModifiedDate { get; set; }
+        public string ModifiedBy { get; set; }
     }
 }
