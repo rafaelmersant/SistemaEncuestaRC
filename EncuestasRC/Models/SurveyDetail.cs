@@ -12,14 +12,13 @@ namespace EncuestasRC.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class SurveyHistory
+    public partial class SurveyDetail
     {
         public int Id { get; set; }
-        public int SurveyId { get; set; }
+        public int SurveyHeaderId { get; set; }
         public int QuestionId { get; set; }
         public int AnswerId { get; set; }
-        public System.DateTime SurveyStarted { get; set; }
-        public Nullable<System.DateTime> SurveyEnded { get; set; }
-        public string UserLogged { get; set; }
+        public int Points { get; set; }
+        public System.DateTime CreationDate { get; set; }
     }
 }

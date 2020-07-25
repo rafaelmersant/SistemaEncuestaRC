@@ -1,0 +1,105 @@
+﻿@model EncuestasRC.Models.Answer
+
+@{
+    ViewBag.Title = "Completar_Encuesta";
+}
+
+<div class="text-center">
+    <h2 class="bg-dark text-light rounded pl-2">@ViewBag.Survey.Title</h2>
+    <input type="hidden" id="surveyId" name="SurveyId" value="@ViewBag.Survey.Id" />
+</div>
+
+<div class="mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <label>Orden </label>
+            <input type="text" id="orderNo" name="orderNo" value="" class="ml-1 col-1"/>
+            <a class="btn btn-sm btn-info" href="javascript:void(0)" title="Buscar">
+                <i class="fa fa-search"></i>
+            </a>
+        </div>
+        <div class="col-12">
+            <label>Cliente</label>
+            <input type="text" id="customer" name="customer" value="" class="col-4"/>
+        </div>
+    </div>
+
+    @using (var db = new EncuestasRC.Models.EncuestaRCEntities())
+    {
+        var index = 1;
+
+        foreach (var item in ViewBag.Questions)
+        {
+            <p class="font-weight-bold bg-light">@index-@item.QuestionTitle</p>
+
+            <table cellpadding="8" class="mb-5">
+
+                <tbody>
+                    <tr>
+                        @foreach (var answer in item.Answers)
+                        {
+                            <td>
+                                <input type="radio" name="question@(index)" id="@item.QuestionId" value="@answer.Id"> @answer.Title
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+
+            </table>
+
+            index += 1;
+        }
+    }
+
+    <button class="btn btn-danger pl-5 pr-5" id="btnSaveSurvey">Terminar</button>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script type="text/javascript">
+
+    const saveSurvey = (id, surveyId, customer, orderNo) => {
+        url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&orderNo=${orderNo}`
+
+        $.ajax({
+            "url": url,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+
+                    console.log('header saved')
+                    $("#btnSaveSurvey").removeAttr('disabled')
+
+                } else {
+                    console.log(response.message);
+                    $("#btnSaveSurvey").removeAttr('disabled')
+                    alert('Hubo un error tratando de guardar la respuesta.');
+                }
+            }
+        });
+    }
+
+    $(document).ready(function () {
+
+        $(".numericOnly").keypress(function (e) {
+            if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false
+        });
+
+        $("#btnSaveSurvey").click(function (e) {
+            e.preventDefault()
+            $("#btnSaveSurvey").attr('disabled', 'disabled')
+
+            const id = 0
+            const surveyId = $("#surveyId").val()
+            const customer = $("#customer").val()
+            const orderNo = $("#orderNo").val()
+
+            saveSurvey(id, surveyId, customer, orderNo);
+        });
+        
+    });
+    
+</script>

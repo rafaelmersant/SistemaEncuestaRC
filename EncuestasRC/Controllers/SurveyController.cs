@@ -11,6 +11,14 @@ namespace EncuestasRC.Controllers
   
     public class SurveyController : Controller
     {
+        public class QuestionAnswers
+        {
+            public int QuestionId { get; set; }
+            public string QuestionTitle { get; set; }
+            public int QuestionPoints { get; set; }
+            public List<Answer> Answers { get; set; }
+        }
+
         // GET: Survey
         public ActionResult Index()
         {
@@ -212,7 +220,7 @@ namespace EncuestasRC.Controllers
                         db.SaveChanges();
 
                         if (sortIndex != currentSortIndex)
-                            UpdateSortIndexQuestions(question.SurveyId, questionId, sortIndex);
+                            Helper.UpdateSortIndexQuestions(question.SurveyId, questionId, sortIndex);
                     }
                 }
             }
@@ -225,54 +233,7 @@ namespace EncuestasRC.Controllers
 
             return Json(new { result = "200", message = question.Id });
         }
-
-        private void UpdateSortIndexQuestions(int surveyId, int questionId, int sortIndex)
-        {
-            try
-            {
-                using (var db = new EncuestaRCEntities())
-                {
-                    bool sort = false;
-                    int index = 1;
-
-                    var questions = db.Questions.Where(q => q.SortIndex >= sortIndex && q.Id != questionId && q.SurveyId == surveyId).OrderBy(o => o.SortIndex).ToList();
-
-                    foreach(var question in questions)
-                    {
-                        if (question.SortIndex == sortIndex)
-                            sort = true;
-
-                        if (sort)
-                        {
-                            if (questions.Count() == 1)
-                                question.SortIndex = sortIndex - 1;
-                            else
-                                question.SortIndex = sortIndex + index;
-
-                            db.SaveChanges();
-                        }
-
-                        index += 1;
-                    }
-
-                    var allQuestions = db.Questions.Where(q => q.SurveyId == surveyId).OrderBy(o => o.SortIndex).ToList();
-                    index = 1;
-
-                    foreach(var question in allQuestions)
-                    {
-                        question.SortIndex = index;
-                        db.SaveChanges();
-
-                        index += 1;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Helper.SendException(ex);
-            }
-        }
-
+        
         [HttpPost]
         public JsonResult DeleteQuestion(int id)
         {
@@ -406,5 +367,118 @@ namespace EncuestasRC.Controllers
 
             return Json(new { result = "200", message = "Success" });
         }
+
+        public ActionResult Completar_Encuesta(int id)
+        {
+            try
+            {
+                if (Session["role"] == null) return RedirectToAction("Index", "Home");
+
+                using (var db = new EncuestaRCEntities())
+                {
+                    Survey survey = db.Surveys.FirstOrDefault(s => s.Id == id);
+                    if(survey != null)
+                    {
+                        List<QuestionAnswers> _questions = new List<QuestionAnswers>();
+
+                        var questions = db.Questions.Where(q => q.SurveyId == survey.Id).ToList();
+                        foreach (var item in questions)
+                        {
+                            var answers = db.Answers.Where(a => a.QuestionId == item.Id).ToList();
+
+                            QuestionAnswers questionAnswers = new QuestionAnswers
+                            {
+                                QuestionId = item.Id,
+                                QuestionTitle = item.Title,
+                                QuestionPoints = item.Points.Value,
+                                Answers = answers
+                            };
+
+                            _questions.Add(questionAnswers);
+                        }
+
+                        ViewBag.Survey = survey;
+                        ViewBag.Questions = _questions;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "Encuesta para completar:" + id);
+            }
+            
+            return View();
+        }
+
+        //Save Survey Header
+        [HttpPost]
+        public JsonResult SaveSurveyHeader(int Id, int surveyId, string customer, string orderNo)
+        {
+            try
+            {
+                using (var db = new EncuestaRCEntities())
+                {
+                    SurveyHeader surveyHeader = db.SurveyHeaders.FirstOrDefault(a => a.Id == Id);
+                    if (surveyHeader != null)
+                    {
+                        surveyHeader.Customer = customer;
+                        surveyHeader.OrderNo = orderNo;
+                        surveyHeader.SurveyEnded = DateTime.Now;
+                    }
+                    else
+                    {
+                        db.SurveyHeaders.Add(new SurveyHeader
+                        {
+                            SurveyId = surveyId,
+                            Customer = customer,
+                            OrderNo = orderNo,
+                            SurveyStarted = DateTime.Now,
+                            UserLogged = User != null ? User.Identity.Name : ""
+                        });
+                    }
+
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "Save Survey SurveyId:" + surveyId);
+
+                return Json(new { result = "500", message = ex.Message });
+            }
+
+            return Json(new { result = "200", message = "Success" });
+        }
+
+        //Save Survey Detail
+        [HttpPost]
+        public JsonResult SaveSurveyDetail(int surveyHeaderId, int questionId, int answerId, int points)
+        {
+            try
+            {
+                using (var db = new EncuestaRCEntities())
+                {
+                    db.SurveyDetails.Add(new SurveyDetail
+                    {
+                        SurveyHeaderId = surveyHeaderId,
+                        QuestionId = questionId,
+                        AnswerId = answerId,
+                        Points = points,
+                        CreationDate = DateTime.Now
+                    });
+
+                    db.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "Save Survey SurveyHeaderId:" + surveyHeaderId);
+
+                return Json(new { result = "500", message = ex.Message });
+            }
+
+            return Json(new { result = "200", message = "Success" });
+        }
+
     }
 }

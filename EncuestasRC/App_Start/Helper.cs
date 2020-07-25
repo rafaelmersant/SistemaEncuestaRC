@@ -1,4 +1,5 @@
-﻿using Sentry;
+﻿using EncuestasRC.Models;
+using Sentry;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -117,6 +118,53 @@ namespace EncuestasRC.App_Start
                 Helper.SendException(ex);
 
                 return false;
+            }
+        }
+
+        public static void UpdateSortIndexQuestions(int surveyId, int questionId, int sortIndex)
+        {
+            try
+            {
+                using (var db = new EncuestaRCEntities())
+                {
+                    bool sort = false;
+                    int index = 1;
+
+                    var questions = db.Questions.Where(q => q.SortIndex >= sortIndex && q.Id != questionId && q.SurveyId == surveyId).OrderBy(o => o.SortIndex).ToList();
+
+                    foreach (var question in questions)
+                    {
+                        if (question.SortIndex == sortIndex)
+                            sort = true;
+
+                        if (sort)
+                        {
+                            if (questions.Count() == 1)
+                                question.SortIndex = sortIndex - 1;
+                            else
+                                question.SortIndex = sortIndex + index;
+
+                            db.SaveChanges();
+                        }
+
+                        index += 1;
+                    }
+
+                    var allQuestions = db.Questions.Where(q => q.SurveyId == surveyId).OrderBy(o => o.SortIndex).ToList();
+                    index = 1;
+
+                    foreach (var question in allQuestions)
+                    {
+                        question.SortIndex = index;
+                        db.SaveChanges();
+
+                        index += 1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
             }
         }
     }

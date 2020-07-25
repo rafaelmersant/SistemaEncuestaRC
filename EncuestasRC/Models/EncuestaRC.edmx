@@ -67,14 +67,25 @@
           <Property Name="ModifiedDate" Type="datetime" />
           <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
         </EntityType>
-        <EntityType Name="SurveyHistory">
+        <EntityType Name="SurveyDetail">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" Nullable="false" />
-          <Property Name="SurveyId" Type="int" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SurveyHeaderId" Type="int" Nullable="false" />
           <Property Name="QuestionId" Type="int" Nullable="false" />
           <Property Name="AnswerId" Type="int" Nullable="false" />
+          <Property Name="Points" Type="int" Nullable="false" />
+          <Property Name="CreationDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SurveyHeader">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SurveyId" Type="int" Nullable="false" />
+          <Property Name="Customer" Type="varchar" MaxLength="100" />
+          <Property Name="OrderNo" Type="varchar" MaxLength="10" />
           <Property Name="SurveyStarted" Type="datetime" Nullable="false" />
           <Property Name="SurveyEnded" Type="datetime" />
           <Property Name="UserLogged" Type="varchar" MaxLength="50" />
@@ -97,33 +108,23 @@
           <EntitySet Name="Question" EntityType="Self.Question" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="QuestionType" EntityType="Self.QuestionType" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Survey" EntityType="Self.Survey" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="SurveyHistory" EntityType="Self.SurveyHistory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SurveyDetail" EntityType="Self.SurveyDetail" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SurveyHeader" EntityType="Self.SurveyHeader" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="EncuestaRCModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="SurveyHistory">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" />
-          <Property Name="SurveyId" Type="Int32" Nullable="false" />
-          <Property Name="QuestionId" Type="Int32" Nullable="false" />
-          <Property Name="AnswerId" Type="Int32" Nullable="false" />
-          <Property Name="SurveyStarted" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="SurveyEnded" Type="DateTime" Precision="3" />
-          <Property Name="UserLogged" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-        </EntityType>
         <EntityContainer Name="EncuestaRCEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="SurveyHistories" EntityType="Self.SurveyHistory" />
           <EntitySet Name="LoginHistories" EntityType="EncuestaRCModel.LoginHistory" />
           <EntitySet Name="QuestionTypes" EntityType="EncuestaRCModel.QuestionType" />
           <EntitySet Name="Users" EntityType="EncuestaRCModel.User" />
           <EntitySet Name="Answers" EntityType="EncuestaRCModel.Answer" />
           <EntitySet Name="Questions" EntityType="EncuestaRCModel.Question" />
           <EntitySet Name="Surveys" EntityType="EncuestaRCModel.Survey" />
+          <EntitySet Name="SurveyDetails" EntityType="EncuestaRCModel.SurveyDetail" />
+          <EntitySet Name="SurveyHeaders" EntityType="EncuestaRCModel.SurveyHeader" />
         </EntityContainer>
         <EntityType Name="LoginHistory">
           <Key>
@@ -199,25 +200,35 @@
           <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
           <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="SurveyDetail">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SurveyHeaderId" Type="Int32" Nullable="false" />
+          <Property Name="QuestionId" Type="Int32" Nullable="false" />
+          <Property Name="AnswerId" Type="Int32" Nullable="false" />
+          <Property Name="Points" Type="Int32" Nullable="false" />
+          <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="SurveyHeader">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SurveyId" Type="Int32" Nullable="false" />
+          <Property Name="Customer" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="OrderNo" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="SurveyStarted" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="SurveyEnded" Type="DateTime" Precision="3" />
+          <Property Name="UserLogged" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="EncuestaRCModelStoreContainer" CdmEntityContainer="EncuestaRCEntities">
-          <EntitySetMapping Name="SurveyHistories">
-            <EntityTypeMapping TypeName="EncuestaRCModel.SurveyHistory">
-              <MappingFragment StoreEntitySet="SurveyHistory">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="SurveyId" ColumnName="SurveyId" />
-                <ScalarProperty Name="QuestionId" ColumnName="QuestionId" />
-                <ScalarProperty Name="AnswerId" ColumnName="AnswerId" />
-                <ScalarProperty Name="SurveyStarted" ColumnName="SurveyStarted" />
-                <ScalarProperty Name="SurveyEnded" ColumnName="SurveyEnded" />
-                <ScalarProperty Name="UserLogged" ColumnName="UserLogged" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="LoginHistories">
             <EntityTypeMapping TypeName="EncuestaRCModel.LoginHistory">
               <MappingFragment StoreEntitySet="LoginHistory">
@@ -294,6 +305,31 @@
                 <ScalarProperty Name="SurveyMonth" ColumnName="SurveyMonth" />
                 <ScalarProperty Name="SurveyYear" ColumnName="SurveyYear" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SurveyDetails">
+            <EntityTypeMapping TypeName="EncuestaRCModel.SurveyDetail">
+              <MappingFragment StoreEntitySet="SurveyDetail">
+                <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+                <ScalarProperty Name="Points" ColumnName="Points" />
+                <ScalarProperty Name="AnswerId" ColumnName="AnswerId" />
+                <ScalarProperty Name="QuestionId" ColumnName="QuestionId" />
+                <ScalarProperty Name="SurveyHeaderId" ColumnName="SurveyHeaderId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SurveyHeaders">
+            <EntityTypeMapping TypeName="EncuestaRCModel.SurveyHeader">
+              <MappingFragment StoreEntitySet="SurveyHeader">
+                <ScalarProperty Name="UserLogged" ColumnName="UserLogged" />
+                <ScalarProperty Name="SurveyEnded" ColumnName="SurveyEnded" />
+                <ScalarProperty Name="SurveyStarted" ColumnName="SurveyStarted" />
+                <ScalarProperty Name="OrderNo" ColumnName="OrderNo" />
+                <ScalarProperty Name="Customer" ColumnName="Customer" />
+                <ScalarProperty Name="SurveyId" ColumnName="SurveyId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

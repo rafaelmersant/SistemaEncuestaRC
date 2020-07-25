@@ -204,7 +204,10 @@
     <Compile Include="Models\Survey.cs">
       <DependentUpon>EncuestaRC.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\SurveyHistory.cs">
+    <Compile Include="Models\SurveyDetail.cs">
+      <DependentUpon>EncuestaRC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SurveyHeader.cs">
       <DependentUpon>EncuestaRC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\User.cs">
@@ -271,6 +274,7 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -388,6 +392,7 @@
     <Content Include="Views\User\UsersList.cshtml" />
     <Content Include="Views\Survey\Index.cshtml" />
     <Content Include="Views\Survey\New.cshtml" />
+    <Content Include="Views\Survey\Completar_Encuesta.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

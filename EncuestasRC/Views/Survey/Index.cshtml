@@ -49,11 +49,13 @@
                     <td>@item.CreateDate</td>
 
                     <td align="center">
-                        <a class="btn btn-sm btn-success" href="@Url.Action("New",new { id = @item.Id })">
-                            <i class="fa fa-edit"></i>
-
+                        <a class="btn btn-sm btn-info" href="@Url.Action("Completar_Encuesta",new { id = @item.Id })" title="Completar encuesta">
+                            <i class="fa fa-file-text"></i>
                         </a>
-                        <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteSurvey(@item.Id)">
+                        <a class="btn btn-sm btn-success" href="@Url.Action("New",new { id = @item.Id })" title="Editar">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteSurvey(@item.Id)" title="Eliminar">
                             <i class="fa fa-remove"></i>
                         </a>
                     </td>
