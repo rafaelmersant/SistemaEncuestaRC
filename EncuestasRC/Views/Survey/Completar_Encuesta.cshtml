@@ -1,8 +1,17 @@
 ﻿@model EncuestasRC.Models.Answer
 
 @{
+    var index = 0;
     ViewBag.Title = "Completar_Encuesta";
 }
+
+<style>
+    .question-empty {
+        background-color: orangered !important;
+        color: white;
+    }
+
+</style>
 
 <div class="text-center">
     <h2 class="bg-dark text-light rounded pl-2">@ViewBag.Survey.Title</h2>
@@ -26,20 +35,18 @@
 
     @using (var db = new EncuestasRC.Models.EncuestaRCEntities())
     {
-        var index = 1;
-
         foreach (var item in ViewBag.Questions)
         {
-            <p class="font-weight-bold bg-light">@index-@item.QuestionTitle</p>
+            <p class="font-weight-bold bg-light pl-1" id="question@(index)">@index-@item.QuestionTitle</p>
 
-            <table cellpadding="8" class="mb-5">
+            <table cellpadding="8" class="mb-4">
 
                 <tbody>
                     <tr>
                         @foreach (var answer in item.Answers)
                         {
                             <td>
-                                <input type="radio" name="question@(index)" id="@item.QuestionId" value="@answer.Id"> @answer.Title
+                                <input type="radio" name="question@(index)" id="@item.QuestionId" value="@answer.Id" data-bind="@answer.Points"> @answer.Title
                             </td>
                         }
                     </tr>
@@ -62,7 +69,7 @@
 <script type="text/javascript">
 
     const saveSurvey = (id, surveyId, customer, orderNo) => {
-        url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&orderNo=${orderNo}`
+        const url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&orderNo=${orderNo}`
 
         $.ajax({
             "url": url,
@@ -71,6 +78,18 @@
                 if (response.result === "200") {
 
                     console.log('header saved')
+                    const surveyHeaderId = response.message
+
+                    for (let index = 0; index < @index; index++) {
+                        if ($(`input[name='question${index}']:checked`).val() !== undefined) {
+                            const questionId = $(`input[name='question${index}']:checked`).attr("id")
+                            const answerId = $(`input[name='question${index}']:checked`).attr("value")
+                            const points = $(`input[name='question${index}']:checked`).attr("data-bind")
+
+                            await saveSurveyDetail(surveyHeaderId, questionId, answerId, points)
+                        } 
+                    }
+
                     $("#btnSaveSurvey").removeAttr('disabled')
 
                 } else {
@@ -82,6 +101,43 @@
         });
     }
 
+    const saveSurveyDetail = async (surveyHeaderId, questionId, answerId, points) => {
+        const url = `/Survey/SaveSurveyDetail?surveyHeaderId=${surveyHeaderId}&questionId=${questionId}&answerId=${answerId}&points=${points}`
+
+        $.ajax({
+            "url": url,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+
+                    console.log('detail saved')
+                    $("#btnSaveSurvey").removeAttr('disabled')
+
+                } else {
+                    console.log(response.message);
+                    $("#btnSaveSurvey").removeAttr('disabled')
+                    alert('Hubo un error tratando de guardar la respuesta.');
+                }
+            }
+        });
+    }
+
+    const validateQuestions = () => {
+        let valid = true;
+
+        for (let index = 0; index < @index; index++) {
+
+            if ($(`input[name='question${index}']:checked`).val() === undefined) {
+                $(`#question${index}`).addClass("question-empty")
+                valid = false
+            } else {
+                $(`#question${index}`).removeClass("question-empty")
+            }
+        }
+
+        return valid;
+    }
+
     $(document).ready(function () {
 
         $(".numericOnly").keypress(function (e) {
@@ -90,6 +146,9 @@
 
         $("#btnSaveSurvey").click(function (e) {
             e.preventDefault()
+
+            if (!validateQuestions()) return false;
+
             $("#btnSaveSurvey").attr('disabled', 'disabled')
 
             const id = 0
@@ -99,7 +158,7 @@
 
             saveSurvey(id, surveyId, customer, orderNo);
         });
-        
+
     });
-    
+
 </script>

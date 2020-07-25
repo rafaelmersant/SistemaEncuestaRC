@@ -414,11 +414,13 @@ namespace EncuestasRC.Controllers
         [HttpPost]
         public JsonResult SaveSurveyHeader(int Id, int surveyId, string customer, string orderNo)
         {
+            SurveyHeader surveyHeader;
+
             try
             {
                 using (var db = new EncuestaRCEntities())
                 {
-                    SurveyHeader surveyHeader = db.SurveyHeaders.FirstOrDefault(a => a.Id == Id);
+                    surveyHeader = db.SurveyHeaders.FirstOrDefault(a => a.Id == Id);
                     if (surveyHeader != null)
                     {
                         surveyHeader.Customer = customer;
@@ -427,14 +429,16 @@ namespace EncuestasRC.Controllers
                     }
                     else
                     {
-                        db.SurveyHeaders.Add(new SurveyHeader
+                        surveyHeader = new SurveyHeader
                         {
                             SurveyId = surveyId,
                             Customer = customer,
                             OrderNo = orderNo,
                             SurveyStarted = DateTime.Now,
-                            UserLogged = User != null ? User.Identity.Name : ""
-                        });
+                            UserLogged = Session["email"] != null ? Session["email"].ToString() : ""
+                        };
+                        
+                        db.SurveyHeaders.Add(surveyHeader);
                     }
 
                     db.SaveChanges();
@@ -447,7 +451,7 @@ namespace EncuestasRC.Controllers
                 return Json(new { result = "500", message = ex.Message });
             }
 
-            return Json(new { result = "200", message = "Success" });
+            return Json(new { result = "200", message = surveyHeader.Id });
         }
 
         //Save Survey Detail
