@@ -1,8 +1,14 @@
-﻿@model IEnumerable<EncuestasRC.Models.Survey>
+﻿@model IEnumerable<EncuestasRC.ViewModels.SurveyViewModel>
 
 @{
     ViewBag.Title = "Encuestas";
 }
+
+<style>
+    .completed-effects:hover {
+        color: white;
+    }
+</style>
 
 <div class="mb-4 bg-dark text-light panel-custom">
     <h5 class="panel-title">
@@ -25,6 +31,9 @@
                 <th class="text-center">
                     Activa
                 </th>
+                <th  class="text-center">
+                    Completadas
+                </th>
                 <th>
                     Creada
                 </th>
@@ -45,6 +54,11 @@
                         {
                         <span>No</span>
                         }
+                    </td>
+                    <td class="text-center">
+                        <a class="text-warning font-weight-bold btn btn-outline-dark w-50 completed-effects" href="@Url.Action("CompletedSurveys",new { id = @item.Id })" title="Completadas">
+                            @item.Completed
+                        </a>
                     </td>
                     <td>@item.CreateDate</td>
 

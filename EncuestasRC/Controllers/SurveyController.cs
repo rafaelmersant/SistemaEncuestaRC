@@ -1,5 +1,6 @@
 ﻿using EncuestasRC.App_Start;
 using EncuestasRC.Models;
+using EncuestasRC.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,14 +30,42 @@ namespace EncuestasRC.Controllers
             {
                 using (var db = new EncuestaRCEntities())
                 {
+                    List<SurveyViewModel> surveysModel = new List<SurveyViewModel>();
+
+                    var allSurveys = db.SurveyHeaders.ToList();
+
                     var surveys = db.Surveys.OrderByDescending(o => o.CreateDate).ToList();
-                    return View(surveys);
+
+                    foreach(var survey in surveys)
+                    {
+                        int completed = allSurveys.Count(s => s.SurveyId == survey.Id);
+
+                        SurveyViewModel surveyViewModel = new SurveyViewModel
+                        {
+                            Id = survey.Id,
+                            Active = survey.Active,
+                            CreateBy = survey.CreateBy,
+                            CreateDate = survey.CreateDate,
+                            Title = survey.Title,
+                            Completed = completed
+                        };
+
+                        surveysModel.Add(surveyViewModel);
+                    }
+
+                    return View(surveysModel);
                 }
             }
             catch(Exception ex)
             {
                 Helper.SendException(ex);
             }
+
+            return View();
+        }
+
+        public ActionResult CompletedSurveys(int id)
+        {
 
             return View();
         }
