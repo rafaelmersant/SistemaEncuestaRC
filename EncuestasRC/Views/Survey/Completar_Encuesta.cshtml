@@ -11,6 +11,13 @@
         color: white;
     }
 
+    .button-disabled {
+        background: gray;
+        border-color: gray;
+        pointer-events: none;
+        cursor: pointer;
+    }
+
 </style>
 
 <div class="text-center">
@@ -18,7 +25,7 @@
     <input type="hidden" id="surveyId" name="SurveyId" value="@ViewBag.Survey.Id" />
 </div>
 
-<div class="mt-5">
+<div class="mt-5" id="surveyDiv">
     <div class="row mb-4">
         <div class="col-12">
             <label>Orden </label>
@@ -37,7 +44,7 @@
     {
         foreach (var item in ViewBag.Questions)
         {
-            <p class="font-weight-bold bg-light pl-1" id="question@(index)">@index-@item.QuestionTitle</p>
+            <p class="font-weight-bold bg-light pl-1" id="question@(index)">@(index+1)-@item.QuestionTitle</p>
 
             <table cellpadding="8" class="mb-4">
 
@@ -59,6 +66,22 @@
     }
 
     <button class="btn btn-danger pl-5 pr-5" id="btnSaveSurvey">Terminar</button>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="successSurvey">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-light pt-5 pb-5">
+                <h5 class="modal-title">Gracias por participar!</h5>
+            
+                <div class="text-center">
+                    <button type="button" class="btn btn-dark" id="closeSuccessSurvey">Cerrar</button>
+                </div>
+                
+            </div>
+          
+        </div>
+    </div>
 </div>
 
 
@@ -87,6 +110,11 @@
                             const points = $(`input[name='question${index}']:checked`).attr("data-bind")
 
                             await saveSurveyDetail(surveyHeaderId, questionId, answerId, points)
+
+                            $("#surveyDiv :input[type=text]").prop("disabled", true);
+                            $(':radio:not(:checked)').attr('disabled', true);
+                            $("#btnSaveSurvey").addClass("button-disabled");
+                            $("#successSurvey").fadeIn();
                         } 
                     }
 
@@ -142,6 +170,11 @@
 
         $(".numericOnly").keypress(function (e) {
             if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false
+        });
+
+        $("#closeSuccessSurvey").click(function (e) {
+            e.preventDefault()
+            $("#successSurvey").fadeOut();
         });
 
         $("#btnSaveSurvey").click(function (e) {
