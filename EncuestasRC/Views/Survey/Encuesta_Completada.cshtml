@@ -1,0 +1,74 @@
+﻿@model EncuestasRC.ViewModels.SurveyCompletedViewModel
+
+@{
+    var index = 0;
+    ViewBag.Title = "Encuesta Completada";
+}
+
+<div class="text-center">
+    <h2 class="bg-dark text-light rounded pl-2">@Model.Title</h2>
+    <input type="hidden" id="surveyId" name="SurveyId" value="@Model.surveyHeader.SurveyId" />
+</div>
+
+<div class="mt-5" id="surveyDiv">
+    <div class="row mb-4">
+        <div class="col-12">
+            <label>Orden </label>
+            <input type="text" id="orderNo" name="orderNo" value="@Model.surveyHeader.OrderNo" readonly="readonly" class="ml-1 col-1" />
+            <a class="btn btn-sm btn-info" href="javascript:void(0)" title="Buscar">
+                <i class="fa fa-search"></i>
+            </a>
+        </div>
+        <div class="col-12">
+            <label>Cliente</label>
+            <input type="text" id="customer" name="customer" value="@Model.surveyHeader.Customer" readonly="readonly" class="col-4" />
+        </div>
+    </div>
+
+    @foreach (var item in ViewBag.Questions)
+    {
+        <p class="font-weight-bold bg-light pl-1" id="question@(index)">@(index + 1)-@item.QuestionTitle</p>
+
+        <table cellpadding="8" class="mb-4">
+
+            <tbody>
+                <tr>
+                    @foreach (var answer in item.Answers)
+                    {
+                        var selectedAnswer = Model.surveyDetail.FirstOrDefault(c => c.QuestionId == item.QuestionId && c.AnswerId == answer.Id) != null ? "checked" : "";
+
+                        <td>
+                            <input type="radio" name="question@(index)" id="@item.QuestionId" value="@answer.Id" data-bind="@answer.Points" 
+                                   @(selectedAnswer)> @answer.Title
+                        </td>
+                    }
+                </tr>
+            </tbody>
+
+        </table>
+
+        index += 1;
+    }
+
+    <button class="btn btn-secondary pl-5 pr-5" id="btnBack" onclick="history.back()">Regresar</button>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+
+        $(".numericOnly").keypress(function (e) {
+            if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false
+        });
+
+        $(':radio:not(:checked)').attr('disabled', true);
+
+    });
+
+</script>

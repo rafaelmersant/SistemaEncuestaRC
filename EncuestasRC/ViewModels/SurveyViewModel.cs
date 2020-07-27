@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EncuestasRC.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -21,5 +22,12 @@ namespace EncuestasRC.ViewModels
 
         public int Completed { get; set; }
 
+    }
+
+    public class SurveyCompletedViewModel
+    {
+        public string Title { get; set; }
+        public SurveyHeader surveyHeader { get; set; }
+        public List<SurveyDetail> surveyDetail { get; set; }
     }
 }

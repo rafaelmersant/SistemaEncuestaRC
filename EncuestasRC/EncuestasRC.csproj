@@ -395,6 +395,7 @@
     <Content Include="Views\Survey\New.cshtml" />
     <Content Include="Views\Survey\Completar_Encuesta.cshtml" />
     <Content Include="Views\Survey\CompletedSurveys.cshtml" />
+    <Content Include="Views\Survey\Encuesta_Completada.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

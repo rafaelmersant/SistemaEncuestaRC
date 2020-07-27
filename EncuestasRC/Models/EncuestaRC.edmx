@@ -86,7 +86,6 @@
           <Property Name="SurveyId" Type="int" Nullable="false" />
           <Property Name="Customer" Type="varchar" MaxLength="100" />
           <Property Name="OrderNo" Type="varchar" MaxLength="10" />
-          <Property Name="SurveyStarted" Type="datetime" Nullable="false" />
           <Property Name="SurveyEnded" Type="datetime" />
           <Property Name="UserLogged" Type="varchar" MaxLength="50" />
         </EntityType>
@@ -219,7 +218,6 @@
           <Property Name="SurveyId" Type="Int32" Nullable="false" />
           <Property Name="Customer" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="OrderNo" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="SurveyStarted" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="SurveyEnded" Type="DateTime" Precision="3" />
           <Property Name="UserLogged" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
@@ -326,7 +324,6 @@
               <MappingFragment StoreEntitySet="SurveyHeader">
                 <ScalarProperty Name="UserLogged" ColumnName="UserLogged" />
                 <ScalarProperty Name="SurveyEnded" ColumnName="SurveyEnded" />
-                <ScalarProperty Name="SurveyStarted" ColumnName="SurveyStarted" />
                 <ScalarProperty Name="OrderNo" ColumnName="OrderNo" />
                 <ScalarProperty Name="Customer" ColumnName="Customer" />
                 <ScalarProperty Name="SurveyId" ColumnName="SurveyId" />

@@ -2,7 +2,7 @@
 
 @{
     var index = 0;
-    ViewBag.Title = "Completar_Encuesta";
+    ViewBag.Title = "Completar Encuesta";
 }
 
 <style>
@@ -29,40 +29,37 @@
     <div class="row mb-4">
         <div class="col-12">
             <label>Orden </label>
-            <input type="text" id="orderNo" name="orderNo" value="" class="ml-1 col-1"/>
+            <input type="text" id="orderNo" name="orderNo" value="" class="ml-1 col-1" />
             <a class="btn btn-sm btn-info" href="javascript:void(0)" title="Buscar">
                 <i class="fa fa-search"></i>
             </a>
         </div>
         <div class="col-12">
             <label>Cliente</label>
-            <input type="text" id="customer" name="customer" value="" class="col-4"/>
+            <input type="text" id="customer" name="customer" value="" class="col-4" />
         </div>
     </div>
 
-    @using (var db = new EncuestasRC.Models.EncuestaRCEntities())
+    @foreach (var item in ViewBag.Questions)
     {
-        foreach (var item in ViewBag.Questions)
-        {
-            <p class="font-weight-bold bg-light pl-1" id="question@(index)">@(index+1)-@item.QuestionTitle</p>
+        <p class="font-weight-bold bg-light pl-1" id="question@(index)">@(index + 1)-@item.QuestionTitle</p>
 
-            <table cellpadding="8" class="mb-4">
+        <table cellpadding="8" class="mb-4">
 
-                <tbody>
-                    <tr>
-                        @foreach (var answer in item.Answers)
-                        {
-                            <td>
-                                <input type="radio" name="question@(index)" id="@item.QuestionId" value="@answer.Id" data-bind="@answer.Points"> @answer.Title
-                            </td>
-                        }
-                    </tr>
-                </tbody>
+            <tbody>
+                <tr>
+                    @foreach (var answer in item.Answers)
+                    {
+                        <td>
+                            <input type="radio" name="question@(index)" id="@item.QuestionId" value="@answer.Id" data-bind="@answer.Points"> @answer.Title
+                        </td>
+                    }
+                </tr>
+            </tbody>
 
-            </table>
+        </table>
 
-            index += 1;
-        }
+        index += 1;
     }
 
     <button class="btn btn-danger pl-5 pr-5" id="btnSaveSurvey">Terminar</button>

@@ -66,6 +66,20 @@ namespace EncuestasRC.Controllers
 
         public ActionResult CompletedSurveys(int id)
         {
+            try
+            {
+                using(var db = new EncuestaRCEntities())
+                {
+                    var surveysHeader = db.SurveyHeaders.Where(s => s.SurveyId == id).ToList();
+                    ViewBag.SurveyTitle = db.Surveys.FirstOrDefault(s => s.Id == id).Title;
+
+                    return View(surveysHeader);
+                }
+            }
+            catch(Exception ex)
+            {
+                Helper.SendException(ex);
+            }
 
             return View();
         }
@@ -397,6 +411,32 @@ namespace EncuestasRC.Controllers
             return Json(new { result = "200", message = "Success" });
         }
 
+        private List<QuestionAnswers> QuestionsWithAnswers(int surveyId)
+        {
+            List<QuestionAnswers> _questions = new List<QuestionAnswers>();
+
+            using (var db = new EncuestaRCEntities())
+            {
+                var questions = db.Questions.Where(q => q.SurveyId == surveyId).ToList();
+                foreach (var item in questions)
+                {
+                    var answers = db.Answers.Where(a => a.QuestionId == item.Id).ToList();
+
+                    QuestionAnswers questionAnswers = new QuestionAnswers
+                    {
+                        QuestionId = item.Id,
+                        QuestionTitle = item.Title,
+                        QuestionPoints = item.Points.Value,
+                        Answers = answers
+                    };
+
+                    _questions.Add(questionAnswers);
+                }
+
+                return _questions;
+            }
+        }
+
         public ActionResult Completar_Encuesta(int id)
         {
             try
@@ -408,23 +448,7 @@ namespace EncuestasRC.Controllers
                     Survey survey = db.Surveys.FirstOrDefault(s => s.Id == id);
                     if(survey != null)
                     {
-                        List<QuestionAnswers> _questions = new List<QuestionAnswers>();
-
-                        var questions = db.Questions.Where(q => q.SurveyId == survey.Id).ToList();
-                        foreach (var item in questions)
-                        {
-                            var answers = db.Answers.Where(a => a.QuestionId == item.Id).ToList();
-
-                            QuestionAnswers questionAnswers = new QuestionAnswers
-                            {
-                                QuestionId = item.Id,
-                                QuestionTitle = item.Title,
-                                QuestionPoints = item.Points.Value,
-                                Answers = answers
-                            };
-
-                            _questions.Add(questionAnswers);
-                        }
+                        List<QuestionAnswers> _questions = QuestionsWithAnswers(survey.Id);
 
                         ViewBag.Survey = survey;
                         ViewBag.Questions = _questions;
@@ -436,6 +460,40 @@ namespace EncuestasRC.Controllers
                 Helper.SendException(ex, "Encuesta para completar:" + id);
             }
             
+            return View();
+        }
+
+        public ActionResult Encuesta_Completada(int id)
+        {
+            try
+            {
+                var surveyCompletedViewModel = new SurveyCompletedViewModel();
+
+                using(var db = new EncuestaRCEntities())
+                {
+                    var surveyHeader = db.SurveyHeaders.FirstOrDefault(h => h.Id == id);
+                    var surveyDetail = db.SurveyDetails.Where(d => d.SurveyHeaderId == id).ToList();
+
+                    if(surveyHeader != null)
+                    {
+                        var survey = db.Surveys.FirstOrDefault(s => s.Id == surveyHeader.SurveyId);
+                        
+                        surveyCompletedViewModel.Title = survey.Title;
+                        surveyCompletedViewModel.surveyHeader = surveyHeader;
+                        surveyCompletedViewModel.surveyDetail = surveyDetail;
+
+                        var questions = QuestionsWithAnswers(surveyHeader.SurveyId);
+                        ViewBag.questions = questions;
+
+                        return View(surveyCompletedViewModel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
             return View();
         }
 
@@ -463,7 +521,7 @@ namespace EncuestasRC.Controllers
                             SurveyId = surveyId,
                             Customer = customer,
                             OrderNo = orderNo,
-                            SurveyStarted = DateTime.Now,
+                            SurveyEnded = DateTime.Now,
                             UserLogged = Session["email"] != null ? Session["email"].ToString() : ""
                         };
                         

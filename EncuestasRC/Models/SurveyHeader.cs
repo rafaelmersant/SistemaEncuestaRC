@@ -18,7 +18,6 @@ namespace EncuestasRC.Models
         public int SurveyId { get; set; }
         public string Customer { get; set; }
         public string OrderNo { get; set; }
-        public System.DateTime SurveyStarted { get; set; }
         public Nullable<System.DateTime> SurveyEnded { get; set; }
         public string UserLogged { get; set; }
     }
