@@ -1,0 +1,114 @@
+﻿@{
+    var index = 0;
+    ViewBag.Title = "Completar Encuesta";
+}
+
+<style>
+    .question-empty {
+        background-color: orangered !important;
+        color: white;
+    }
+
+    .button-disabled {
+        background: gray;
+        border-color: gray;
+        pointer-events: none;
+        cursor: pointer;
+    }
+</style>
+
+<div class="text-center">
+    <h2 class="bg-dark text-light rounded pl-2">@ViewBag.Survey.Title</h2>
+    <input type="hidden" id="surveyId" name="SurveyId" value="@ViewBag.Survey.Id" />
+</div>
+
+@*<button class="btn btn-info" id="btnSend">Enviar</button>*@
+<div id="editor"></div>
+
+<div class="mt-5" id="surveyDiv">
+    <div class="row mb-4 ml-2">
+        <h3 class="text-info">Reporte de Encuesta</h3>
+    </div>
+
+    @foreach (var item in ViewBag.Questions)
+    {
+        <p class="font-weight-bold bg-light pl-1" id="question@(index)">@(index + 1)-@item.QuestionTitle</p>
+
+        <table cellpadding="8" class="mb-4">
+
+            <tbody>
+
+                @foreach (var answer in item.Answers)
+                {
+                    IEnumerable<dynamic> answers = ViewBag.Answers;
+                    var points = answers.FirstOrDefault(a => a.AnswerId == answer.Id).AnswerPoints;
+
+                    <tr>
+                        <td>
+                            <input type="radio" disabled name="question@(index)" id="@item.QuestionId" value="@answer.Id" data-bind="@answer.Points"> @answer.Title
+                        </td>
+                        <td width="80%">
+                            <div class="w-100 row">
+                                <div class="ml-1 bg-danger text-right" style="width:@(points)%"><span class="text-dark"></span></div>
+                                <div class="col">
+                                    <span class="text-info">@points</span>
+                                </div>
+
+                            </div>
+
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+        index += 1;
+    }
+
+    <button class="btn btn-secondary pl-5 pr-5 mt-3" id="btnBack" onclick="history.back()">Regresar</button>
+
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="successSurvey">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content bg-danger border border-dark">
+            <div>
+                <h5 class="modal-title text-center text-light pt-3 pb-3">Gracias por participar!</h5>
+
+                <div class="text-center pt-3 pb-4">
+                    <button type="button" class="btn btn-dark" id="closeSuccessSurvey">Cerrar</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var doc = new jsPDF();
+        var specialElementHandlers = {
+            '#editor': function (element, renderer) {
+                return true;
+            }
+        };
+
+        $(".numericOnly").keypress(function (e) {
+            if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false
+        });
+    });
+
+</script>
+

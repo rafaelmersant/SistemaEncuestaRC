@@ -20,6 +20,12 @@ namespace EncuestasRC.Controllers
             public List<Answer> Answers { get; set; }
         }
 
+        public class AnswersPoints
+        {
+            public int AnswerId { get; set; }
+            public int AnswerPoints { get; set; }
+        }
+
         // GET: Survey
         public ActionResult Index()
         {
@@ -70,7 +76,7 @@ namespace EncuestasRC.Controllers
             {
                 using(var db = new EncuestaRCEntities())
                 {
-                    var surveysHeader = db.SurveyHeaders.Where(s => s.SurveyId == id).ToList();
+                    var surveysHeader = db.SurveyHeaders.Where(s => s.SurveyId == id).OrderByDescending(o => o.SurveyEnded).ToList();
                     ViewBag.SurveyTitle = db.Surveys.FirstOrDefault(s => s.Id == id).Title;
 
                     return View(surveysHeader);
@@ -421,7 +427,7 @@ namespace EncuestasRC.Controllers
                 foreach (var item in questions)
                 {
                     var answers = db.Answers.Where(a => a.QuestionId == item.Id).ToList();
-
+                    
                     QuestionAnswers questionAnswers = new QuestionAnswers
                     {
                         QuestionId = item.Id,
@@ -492,6 +498,49 @@ namespace EncuestasRC.Controllers
             catch (Exception ex)
             {
                 Helper.SendException(ex);
+            }
+
+            return View();
+        }
+
+        public ActionResult Reporte_Encuesta(int id)
+        {
+            try
+            {
+                if (Session["role"] == null) return RedirectToAction("Index", "Home");
+
+                using (var db = new EncuestaRCEntities())
+                {
+                    var details = (from h in db.SurveyHeaders
+                                   join d in db.SurveyDetails on h.Id equals d.SurveyHeaderId
+                                   where h.SurveyId == id
+                                   select d).ToList();
+                    
+                    Survey survey = db.Surveys.FirstOrDefault(s => s.Id == id);
+                    if (survey != null)
+                    {
+                        List<QuestionAnswers> _questions = QuestionsWithAnswers(survey.Id);
+                        List<AnswersPoints> _answers = new List<AnswersPoints>();
+
+                        foreach(var question in _questions)
+                        {
+                            foreach(var answer in question.Answers)
+                            {
+                                var answerTotal = details.Count(a => a.AnswerId == answer.Id);
+
+                                _answers.Add(new AnswersPoints() { AnswerId = answer.Id, AnswerPoints = answerTotal });
+                            }
+                        }
+
+                        ViewBag.Survey = survey;
+                        ViewBag.Questions = _questions;
+                        ViewBag.Answers = _answers;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "Reporte de Encuesta:" + id);
             }
 
             return View();

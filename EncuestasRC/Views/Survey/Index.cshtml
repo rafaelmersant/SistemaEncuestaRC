@@ -38,7 +38,7 @@
                     Creada
                 </th>
 
-                <th style="min-width: 100px"></th>
+                <th style="min-width: 130px"></th>
             </tr>
         </thead>
         <tbody>
@@ -63,6 +63,9 @@
                     <td>@item.CreateDate</td>
 
                     <td align="center">
+                        <a class="btn btn-sm btn-warning" href="@Url.Action("Reporte_Encuesta",new { id = @item.Id })" title="Reporte de encuesta">
+                            <i class="fa fa-bar-chart"></i>
+                        </a>
                         <a class="btn btn-sm btn-info" href="@Url.Action("Completar_Encuesta",new { id = @item.Id })" title="Completar encuesta">
                             <i class="fa fa-file-text"></i>
                         </a>
