@@ -85,6 +85,7 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="SurveyId" Type="int" Nullable="false" />
           <Property Name="Customer" Type="varchar" MaxLength="100" />
+          <Property Name="CustomerType" Type="int" />
           <Property Name="OrderNo" Type="varchar" MaxLength="10" />
           <Property Name="SurveyEnded" Type="datetime" />
           <Property Name="UserLogged" Type="varchar" MaxLength="50" />
@@ -217,6 +218,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="SurveyId" Type="Int32" Nullable="false" />
           <Property Name="Customer" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CustomerType" Type="Int32" />
           <Property Name="OrderNo" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="SurveyEnded" Type="DateTime" Precision="3" />
           <Property Name="UserLogged" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -325,6 +327,7 @@
                 <ScalarProperty Name="UserLogged" ColumnName="UserLogged" />
                 <ScalarProperty Name="SurveyEnded" ColumnName="SurveyEnded" />
                 <ScalarProperty Name="OrderNo" ColumnName="OrderNo" />
+                <ScalarProperty Name="CustomerType" ColumnName="CustomerType" />
                 <ScalarProperty Name="Customer" ColumnName="Customer" />
                 <ScalarProperty Name="SurveyId" ColumnName="SurveyId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />

@@ -12,7 +12,7 @@
 
 
 <div>
-    <table id="usersTable" class="table table-striped table-bordered table-condensed table-sm">
+    <table id="surveysTable" class="table table-striped table-bordered table-condensed table-sm">
         <thead>
             <tr>
                 <th style="width: 150px; max-width: 150px">
@@ -22,9 +22,12 @@
                     Cliente
                 </th>
                 <th>
+                    Tipo Cliente
+                </th>
+                <th>
                     Orden
                 </th>
-                
+
                 <th class="text-center">
                     Detalle
                 </th>
@@ -33,26 +36,44 @@
         <tbody>
             @foreach (var item in Model)
             {
-                <tr>
-                    <td>@item.SurveyEnded</td>
-                    <td>
-                        @if (string.IsNullOrEmpty(item.Customer))
-                        {
-                            <span>Anónimo</span>
-                        }
-                        else
-                        {
-                            <span>@item.Customer</span>
-                        }
-                    </td>
-                    <td>@item.OrderNo</td>
+            <tr>
+                <td>@item.SurveyEnded.Value.Date.ToString("MM/dd/yyyy")</td>
+                <td>
+                    @if (string.IsNullOrEmpty(item.Customer))
+                    {
+                        <span>Anónimo</span>
+                    }
+                    else
+                    {
+                        <span>@item.Customer</span>
+                    }
+                </td>
+                <td>
+                    @if (item.CustomerType == 1)
+                    {
+                        <span>Minorista</span>
+                    }
+                    else if (item.CustomerType == 2)
+                    {
+                        <span>Mayorista</span>
+                    }
+                    else if (item.CustomerType == 3)
+                    {
+                        <span>Clave</span>
+                    }
+                    else
+                    {
+                        <span></span>
+                    }
+                </td>
+                <td>@item.OrderNo</td>
 
-                    <td align="center">
-                        <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id })" title="Ver detalles">
-                            <i class="fa fa-file-text"></i>
-                        </a>
-                    </td>
-                </tr>
+                <td align="center">
+                    <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id })" title="Ver detalles">
+                        <i class="fa fa-file-text"></i>
+                    </a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
@@ -85,8 +106,10 @@
     }
 
     $(document).ready(function () {
-        $("#usersTable").DataTable();
-
+        surveysTable = $("#surveysTable").DataTable({
+            "order": [[0, "desc"]]
+        });
+        
         //Replace Previous -> Anterior
         $('body :not(script)').contents().filter(function () {
             return this.nodeType === 3;

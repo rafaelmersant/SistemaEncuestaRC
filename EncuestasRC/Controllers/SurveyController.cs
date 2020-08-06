@@ -548,7 +548,7 @@ namespace EncuestasRC.Controllers
 
         //Save Survey Header
         [HttpPost]
-        public JsonResult SaveSurveyHeader(int Id, int surveyId, string customer, string orderNo)
+        public JsonResult SaveSurveyHeader(int Id, int surveyId, string customer, int customerType, string orderNo, string date)
         {
             SurveyHeader surveyHeader;
 
@@ -560,6 +560,7 @@ namespace EncuestasRC.Controllers
                     if (surveyHeader != null)
                     {
                         surveyHeader.Customer = customer;
+                        surveyHeader.CustomerType = customerType;
                         surveyHeader.OrderNo = orderNo;
                         surveyHeader.SurveyEnded = DateTime.Now;
                     }
@@ -569,8 +570,9 @@ namespace EncuestasRC.Controllers
                         {
                             SurveyId = surveyId,
                             Customer = customer,
+                            CustomerType = customerType,
                             OrderNo = orderNo,
-                            SurveyEnded = DateTime.Now,
+                            SurveyEnded = Convert.ToDateTime(date),
                             UserLogged = Session["email"] != null ? Session["email"].ToString() : ""
                         };
                         

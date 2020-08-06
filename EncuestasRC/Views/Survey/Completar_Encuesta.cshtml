@@ -15,8 +15,9 @@
         pointer-events: none;
         cursor: pointer;
     }
-
 </style>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 <div class="text-center">
     <h2 class="bg-dark text-light rounded pl-2">@ViewBag.Survey.Title</h2>
@@ -27,18 +28,65 @@
 <div id="editor"></div>
 
 <div class="mt-5" id="surveyDiv">
+
     <div class="row mb-4">
+
         <div class="col-12">
-            <label>Orden </label>
-            <input type="text" id="orderNo" name="orderNo" value="" class="ml-1 col-1" />
-            <a class="btn btn-sm btn-info" href="javascript:void(0)" title="Buscar">
-                <i class="fa fa-search"></i>
-            </a>
+            <div class="form-row">
+                <div class="col-1">
+                    <label class="col-form-label col-form-label-sm">Fecha</label>
+                </div>
+
+                <div class="col-2">
+                    <input type="text" id="surveyDate" name="surveyDate" value="" class="datepicker form-control form-control-sm" autocomplete="off"/>
+                </div>
+            </div>
         </div>
-        <div class="col-12">
-            <label>Cliente</label>
-            <input type="text" id="customer" name="customer" value="" class="col-4" />
+
+        <div class="col-12 mt-1">
+            <div class="form-row">
+                <div class="col-1">
+                    <label class="col-form-label col-form-label-sm">Orden</label>
+                </div>
+                <div class="col-2">
+                    <input type="text" id="orderNo" name="orderNo" value="" class="form-control form-control-sm" autocomplete="off" />
+                </div>
+                <div class="col-1">
+                    <a class="btn btn-sm btn-info" href="javascript:void(0)" id="btnSearchOrder" title="Buscar" style="margin-top: 1px">
+                        <i class="fa fa-search"></i>
+                    </a>
+                </div>
+            </div>
         </div>
+
+        <div class="col-12 mt-1">
+            <div class="form-row">
+                <div class="col-1">
+                    <label class="col-form-label col-form-label-sm">Cliente</label>
+                </div>
+
+                <div class="col-4">
+                    <input type="text" id="customer" name="customer" value="" class="form-control form-control-sm" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-1">
+            <div class="form-row">
+                <div class="col-1">
+                    <label class="col-form-label col-form-label-sm">Tipo</label>
+                </div>
+                <div class="col-2">
+                    <select id="customerType" name="customerType" class="form-control form-control-sm">
+                        <option value="0">--Seleccionar--</option>
+                        <option value="1">Minorista</option>
+                        <option value="2">Mayorista</option>
+                        <option value="3">Clave</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     @foreach (var item in ViewBag.Questions)
@@ -71,13 +119,13 @@
         <div class="modal-content bg-danger border border-dark">
             <div>
                 <h5 class="modal-title text-center text-light pt-3 pb-3">Gracias por participar!</h5>
-            
+
                 <div class="text-center pt-3 pb-4">
                     <button type="button" class="btn btn-dark" id="closeSuccessSurvey">Cerrar</button>
                 </div>
-                
+
             </div>
-          
+
         </div>
     </div>
 </div>
@@ -85,14 +133,17 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-}
 
-<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+    @*<script src="https://code.jquery.com/jquery-1.12.4.js"></script>*@
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    @*<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>*@
+}
 
 <script type="text/javascript">
 
-    const saveSurvey = (id, surveyId, customer, orderNo) => {
-        const url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&orderNo=${orderNo}`
+    const saveSurvey = (id, surveyId, customer, customerType, orderNo, date) => {
+        const url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&customerType=${customerType}&orderNo=${orderNo}&date=${date}`
 
         $.ajax({
             "url": url,
@@ -112,10 +163,12 @@
                             await saveSurveyDetail(surveyHeaderId, questionId, answerId, points)
 
                             $("#surveyDiv :input[type=text]").prop("disabled", true);
+                            $("#customerType").prop("disabled", true);
                             $(':radio:not(:checked)').attr('disabled', true);
+                            $("#btnSearchOrder").addClass("button-disabled");
                             $("#btnSaveSurvey").addClass("button-disabled");
                             $("#successSurvey").fadeIn();
-                        } 
+                        }
                     }
 
                     $("#btnSaveSurvey").removeAttr('disabled')
@@ -168,20 +221,23 @@
 
     $(document).ready(function () {
 
-        var doc = new jsPDF();
-        var specialElementHandlers = {
-            '#editor': function (element, renderer) {
-                return true;
-            }
-        };
+        $(".datepicker").val(new Date().toLocaleDateString())
+        $(".datepicker").datepicker();
+
+        //var doc = new jsPDF();
+        //var specialElementHandlers = {
+        //    '#editor': function (element, renderer) {
+        //        return true;
+        //    }
+        //};
 
         $(".numericOnly").keypress(function (e) {
             if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false
         });
-        
+
         $("#btnSend").click(function (e) {
             e.preventDefault();
-            
+
             doc.fromHTML($('#surveyDiv').html(), 15, 15, {
                 'width': 170,
                 'elementHandlers': specialElementHandlers
@@ -194,7 +250,7 @@
             $("#successSurvey").fadeOut();
         });
 
-        $("#btnSaveSurvey").click(function (e) {
+        $("#btnSaveSurvey").click(async function (e) {
             e.preventDefault()
 
             if (!validateQuestions()) return false;
@@ -204,9 +260,11 @@
             const id = 0
             const surveyId = $("#surveyId").val()
             const customer = $("#customer").val()
+            const customerType = $("#customerType").val()
             const orderNo = $("#orderNo").val()
+            const date = $(".datepicker").val()
 
-            saveSurvey(id, surveyId, customer, orderNo);
+            await saveSurvey(id, surveyId, customer, customerType, orderNo, date);
         });
 
     });

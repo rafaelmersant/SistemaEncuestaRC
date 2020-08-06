@@ -15,13 +15,13 @@
 ****5-Una pantalla para completar/llenar las encuestas (donde respondera todas las preguntas)
 ****6-Una pantalla para ver el historico de encuestas (ver todas las encuestas creadas)
 7-Un reporte con Graficas (aun por definir informacion a presentar)
-8-un reporte para ver los resultados de encuestas y sus preguntas, asi como cuantos han completado la encuesta (Permitir exportar a excel)
+****8-un reporte para ver los resultados de encuestas y sus preguntas, asi como cuantos han completado la encuesta (Permitir exportar a excel)
 
 
 Tasks:
 *****1-Agregar editedBy, editedOn para Survey, Question, Answers
 *****2-Crear Modal para respuestas (listado, modificar/eliminar)
-3-Agregar fecha al momento de completar encuesta
+*****3-Agregar fecha al momento de completar encuesta
 4-Filtrar por fecha las encuestas completadas
-5-Agregar un campo "Tipo" para especificar el tipo de cliente al momento de llegar la encuesta
+*****5-Agregar un campo "Tipo" para especificar el tipo de cliente al momento de llegar la encuesta
 

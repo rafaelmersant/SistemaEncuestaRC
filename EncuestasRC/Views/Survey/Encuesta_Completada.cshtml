@@ -13,16 +13,61 @@
 <div class="mt-5" id="surveyDiv">
     <div class="row mb-4">
         <div class="col-12">
-            <label>Orden </label>
-            <input type="text" id="orderNo" name="orderNo" value="@Model.surveyHeader.OrderNo" readonly="readonly" class="ml-1 col-1" />
-            <a class="btn btn-sm btn-info" href="javascript:void(0)" title="Buscar">
-                <i class="fa fa-search"></i>
-            </a>
+            <div class="form-row">
+                <div class="col-1">
+                    <label class="col-form-label col-form-label-sm">Fecha</label>
+                </div>
+
+                <div class="col-2">
+                    <input type="text" id="surveyDate" name="surveyDate" value="@Model.surveyHeader.SurveyEnded.Value.Date.ToString("MM/dd/yyyy")" class="datepicker form-control form-control-sm" autocomplete="off" />
+                </div>
+            </div>
         </div>
-        <div class="col-12">
-            <label>Cliente</label>
-            <input type="text" id="customer" name="customer" value="@Model.surveyHeader.Customer" readonly="readonly" class="col-4" />
+
+        <div class="col-12 mt-1">
+            <div class="form-row">
+                <div class="col-1">
+                    <label class="col-form-label col-form-label-sm">Orden</label>
+                </div>
+                <div class="col-2">
+                    <input type="text" id="orderNo" name="orderNo" value="@Model.surveyHeader.OrderNo" class="form-control form-control-sm" autocomplete="off" />
+                </div>
+                <div class="col-1">
+                    <a class="btn btn-sm btn-info" href="javascript:void(0)" id="btnSearchOrder" title="Buscar" style="margin-top: 1px">
+                        <i class="fa fa-search"></i>
+                    </a>
+                </div>
+            </div>
         </div>
+
+        <div class="col-12 mt-1">
+            <div class="form-row">
+                <div class="col-1">
+                    <label class="col-form-label col-form-label-sm">Cliente</label>
+                </div>
+
+                <div class="col-4">
+                    <input type="text" id="customer" name="customer" value="@Model.surveyHeader.Customer" class="form-control form-control-sm" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-1">
+            <div class="form-row">
+                <div class="col-1">
+                    <label class="col-form-label col-form-label-sm">Tipo</label>
+                </div>
+                <div class="col-2">
+                    <select id="customerType" name="customerType" class="form-control form-control-sm">
+                        <option value="0">--Seleccionar--</option>
+                        <option value="1">Minorista</option>
+                        <option value="2">Mayorista</option>
+                        <option value="3">Clave</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     @foreach (var item in ViewBag.Questions)
@@ -66,9 +111,14 @@
         $(".numericOnly").keypress(function (e) {
             if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false
         });
-
+        
+        $("#surveyDiv :input[type=text]").prop("disabled", true);
+        $("#customerType").prop("disabled", true);
         $(':radio:not(:checked)').attr('disabled', true);
 
+        
+        $("#customerType").val(@Model.surveyHeader.CustomerType);
+        
     });
 
 </script>
