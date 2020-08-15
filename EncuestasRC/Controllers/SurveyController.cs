@@ -3,6 +3,7 @@ using EncuestasRC.Models;
 using EncuestasRC.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -126,13 +127,35 @@ namespace EncuestasRC.Controllers
         }
 
         [HttpPost]
+        public JsonResult CustomerNameForOrder(string order)
+        {
+            DataSet customerNameData = Helper.GetCustomerName(order);
+
+            try
+            {
+                if (customerNameData.Tables.Count > 0 && customerNameData.Tables[0].Rows.Count > 0)
+                {
+                    return Json(new { result = "200", message = customerNameData.Tables[0].Rows[0].ItemArray[0].ToString() });
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "order:" + order);
+
+                return Json(new { result = "500", message = ex.Message });
+            }
+
+            return Json(new { result = "404", message = "No encontrado" });
+        }
+
+        [HttpPost]
         public JsonResult NewSurvey(string title, bool active)
         {
             Survey survey;
 
             try
             {
-                using(var db = new EncuestaRCEntities())
+                using (var db = new EncuestaRCEntities())
                 {
                     survey = new Survey
                     {
@@ -157,7 +180,7 @@ namespace EncuestasRC.Controllers
 
             return Json(new { result = "200", message = survey.Id });
         }
-
+        
         [HttpPost]
         public JsonResult EditSurvey(string title, bool active, int id)
         {

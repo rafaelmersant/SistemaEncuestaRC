@@ -25,3 +25,4 @@ Tasks:
 4-Filtrar por fecha las encuestas completadas
 *****5-Agregar un campo "Tipo" para especificar el tipo de cliente al momento de llegar la encuesta
 
+-Buscar nombre de Cliente por nombre.

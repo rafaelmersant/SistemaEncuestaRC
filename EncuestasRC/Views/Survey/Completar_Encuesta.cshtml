@@ -245,6 +245,28 @@
             doc.save('survey-test.pdf');
         });
 
+        $("#btnSearchOrder").click(function (e) {
+            e.preventDefault();
+
+            const order = $("#orderNo").val();
+
+            if (order) {
+                $.ajax({
+                    "url": `/Survey/CustomerNameForOrder?order=${order}`,
+                    "type": "POST",
+                    "success": async function (response) {
+                        if (response.result === "200" || response.result === "404") {
+
+                            $("#customer").val(response.message);
+                        } else {
+                            console.log(response.message);
+                            alert('Hubo un error tratando de consultar la orden.');
+                        }
+                    }
+                });
+            }
+        });
+
         $("#closeSuccessSurvey").click(function (e) {
             e.preventDefault()
             $("#successSurvey").fadeOut();

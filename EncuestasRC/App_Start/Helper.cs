@@ -3,6 +3,8 @@ using Sentry;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
+using System.Data.Odbc;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -166,6 +168,55 @@ namespace EncuestasRC.App_Start
             {
                 Helper.SendException(ex);
             }
+        }
+
+        public static DataSet GetCustomerName(string order)
+        {
+            string orderNo = order;
+            string orderType = string.Empty;
+            string sQuery = string.Empty;
+            string environmentID = ConfigurationManager.AppSettings["EnvironmentEncuestas"];
+
+            if (order.Contains("-"))
+            {
+                orderNo = order.Split('-')[0];
+                orderType = order.Split('-')[1];
+            }
+                
+            if (string.IsNullOrEmpty(orderType))
+                sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura FROM [QS36F.RCOSMF00] WHERE OSNUOS = " + orderNo;
+            else 
+                sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura FROM [QS36F.RCOSMF00] WHERE OSTIDO IN ('" + orderType + "') AND OSNUOS = " + orderNo;
+
+            if (environmentID != "DEV")
+                sQuery = sQuery.Replace("[", "").Replace("]", "");
+
+            return ExecuteDataSetODBC(sQuery, null);
+        }
+
+        public static DataSet ExecuteDataSetODBC(string query, OdbcParameter[] parameters = null)
+        {
+            string sConn = ConfigurationManager.AppSettings["sConnSQLODBC"];
+
+            OdbcConnection oconn = new OdbcConnection(sConn);
+            OdbcCommand ocmd = new OdbcCommand(query, oconn);
+            OdbcDataAdapter adapter;
+            DataSet dsData = new DataSet();
+
+            ocmd.CommandType = CommandType.Text;
+
+            if (parameters != null)
+            {
+                ocmd.Parameters.Clear();
+
+                foreach (OdbcParameter param in parameters)
+                    ocmd.Parameters.Add(param);
+            }
+
+            adapter = new OdbcDataAdapter(ocmd);
+            adapter.Fill(dsData);
+
+            return dsData;
         }
     }
 }
