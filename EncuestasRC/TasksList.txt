@@ -22,7 +22,7 @@ Tasks:
 *****1-Agregar editedBy, editedOn para Survey, Question, Answers
 *****2-Crear Modal para respuestas (listado, modificar/eliminar)
 *****3-Agregar fecha al momento de completar encuesta
-4-Filtrar por fecha las encuestas completadas
+*****4-Filtrar por fecha las encuestas completadas
 *****5-Agregar un campo "Tipo" para especificar el tipo de cliente al momento de llegar la encuesta
 
 -Buscar nombre de Cliente por nombre.

@@ -71,14 +71,17 @@ namespace EncuestasRC.Controllers
             return View();
         }
 
-        public ActionResult CompletedSurveys(int id)
+        public ActionResult CompletedSurveys(int? id)
         {
             try
             {
-                using(var db = new EncuestaRCEntities())
+                if (Session["role"] == null || id == null) return RedirectToAction("Index", "Home");
+
+                using (var db = new EncuestaRCEntities())
                 {
                     var surveysHeader = db.SurveyHeaders.Where(s => s.SurveyId == id).OrderByDescending(o => o.SurveyEnded).ToList();
                     ViewBag.SurveyTitle = db.Surveys.FirstOrDefault(s => s.Id == id).Title;
+                    ViewBag.SurveyId = id;
 
                     return View(surveysHeader);
                 }
@@ -123,6 +126,109 @@ namespace EncuestasRC.Controllers
                 Helper.SendException(ex, "Encuesta:" + id);
             }
             
+            return View();
+        }
+
+        public ActionResult Completar_Encuesta(int? id)
+        {
+            try
+            {
+                if (Session["role"] == null || id == null) return RedirectToAction("Index", "Home");
+
+                using (var db = new EncuestaRCEntities())
+                {
+                    Survey survey = db.Surveys.FirstOrDefault(s => s.Id == id);
+                    if (survey != null)
+                    {
+                        List<QuestionAnswers> _questions = QuestionsWithAnswers(survey.Id);
+
+                        ViewBag.Survey = survey;
+                        ViewBag.Questions = _questions;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "Encuesta para completar:" + id);
+            }
+
+            return View();
+        }
+
+        public ActionResult Encuesta_Completada(int id)
+        {
+            try
+            {
+                var surveyCompletedViewModel = new SurveyCompletedViewModel();
+
+                using (var db = new EncuestaRCEntities())
+                {
+                    var surveyHeader = db.SurveyHeaders.FirstOrDefault(h => h.Id == id);
+                    var surveyDetail = db.SurveyDetails.Where(d => d.SurveyHeaderId == id).ToList();
+
+                    if (surveyHeader != null)
+                    {
+                        var survey = db.Surveys.FirstOrDefault(s => s.Id == surveyHeader.SurveyId);
+
+                        surveyCompletedViewModel.Title = survey.Title;
+                        surveyCompletedViewModel.surveyHeader = surveyHeader;
+                        surveyCompletedViewModel.surveyDetail = surveyDetail;
+
+                        var questions = QuestionsWithAnswers(surveyHeader.SurveyId);
+                        ViewBag.questions = questions;
+
+                        return View(surveyCompletedViewModel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex);
+            }
+
+            return View();
+        }
+
+        public ActionResult Reporte_Encuesta(int id)
+        {
+            try
+            {
+                if (Session["role"] == null) return RedirectToAction("Index", "Home");
+
+                using (var db = new EncuestaRCEntities())
+                {
+                    var details = (from h in db.SurveyHeaders
+                                   join d in db.SurveyDetails on h.Id equals d.SurveyHeaderId
+                                   where h.SurveyId == id
+                                   select d).ToList();
+
+                    Survey survey = db.Surveys.FirstOrDefault(s => s.Id == id);
+                    if (survey != null)
+                    {
+                        List<QuestionAnswers> _questions = QuestionsWithAnswers(survey.Id);
+                        List<AnswersPoints> _answers = new List<AnswersPoints>();
+
+                        foreach (var question in _questions)
+                        {
+                            foreach (var answer in question.Answers)
+                            {
+                                var answerTotal = details.Count(a => a.AnswerId == answer.Id);
+
+                                _answers.Add(new AnswersPoints() { AnswerId = answer.Id, AnswerPoints = answerTotal });
+                            }
+                        }
+
+                        ViewBag.Survey = survey;
+                        ViewBag.Questions = _questions;
+                        ViewBag.Answers = _answers;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "Reporte de Encuesta:" + id);
+            }
+
             return View();
         }
 
@@ -466,109 +572,6 @@ namespace EncuestasRC.Controllers
             }
         }
 
-        public ActionResult Completar_Encuesta(int id)
-        {
-            try
-            {
-                if (Session["role"] == null) return RedirectToAction("Index", "Home");
-
-                using (var db = new EncuestaRCEntities())
-                {
-                    Survey survey = db.Surveys.FirstOrDefault(s => s.Id == id);
-                    if(survey != null)
-                    {
-                        List<QuestionAnswers> _questions = QuestionsWithAnswers(survey.Id);
-
-                        ViewBag.Survey = survey;
-                        ViewBag.Questions = _questions;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Helper.SendException(ex, "Encuesta para completar:" + id);
-            }
-            
-            return View();
-        }
-
-        public ActionResult Encuesta_Completada(int id)
-        {
-            try
-            {
-                var surveyCompletedViewModel = new SurveyCompletedViewModel();
-
-                using(var db = new EncuestaRCEntities())
-                {
-                    var surveyHeader = db.SurveyHeaders.FirstOrDefault(h => h.Id == id);
-                    var surveyDetail = db.SurveyDetails.Where(d => d.SurveyHeaderId == id).ToList();
-
-                    if(surveyHeader != null)
-                    {
-                        var survey = db.Surveys.FirstOrDefault(s => s.Id == surveyHeader.SurveyId);
-                        
-                        surveyCompletedViewModel.Title = survey.Title;
-                        surveyCompletedViewModel.surveyHeader = surveyHeader;
-                        surveyCompletedViewModel.surveyDetail = surveyDetail;
-
-                        var questions = QuestionsWithAnswers(surveyHeader.SurveyId);
-                        ViewBag.questions = questions;
-
-                        return View(surveyCompletedViewModel);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Helper.SendException(ex);
-            }
-
-            return View();
-        }
-
-        public ActionResult Reporte_Encuesta(int id)
-        {
-            try
-            {
-                if (Session["role"] == null) return RedirectToAction("Index", "Home");
-
-                using (var db = new EncuestaRCEntities())
-                {
-                    var details = (from h in db.SurveyHeaders
-                                   join d in db.SurveyDetails on h.Id equals d.SurveyHeaderId
-                                   where h.SurveyId == id
-                                   select d).ToList();
-                    
-                    Survey survey = db.Surveys.FirstOrDefault(s => s.Id == id);
-                    if (survey != null)
-                    {
-                        List<QuestionAnswers> _questions = QuestionsWithAnswers(survey.Id);
-                        List<AnswersPoints> _answers = new List<AnswersPoints>();
-
-                        foreach(var question in _questions)
-                        {
-                            foreach(var answer in question.Answers)
-                            {
-                                var answerTotal = details.Count(a => a.AnswerId == answer.Id);
-
-                                _answers.Add(new AnswersPoints() { AnswerId = answer.Id, AnswerPoints = answerTotal });
-                            }
-                        }
-
-                        ViewBag.Survey = survey;
-                        ViewBag.Questions = _questions;
-                        ViewBag.Answers = _answers;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Helper.SendException(ex, "Reporte de Encuesta:" + id);
-            }
-
-            return View();
-        }
-
         //Save Survey Header
         [HttpPost]
         public JsonResult SaveSurveyHeader(int Id, int surveyId, string customer, int customerType, string orderNo, string date)
@@ -643,6 +646,113 @@ namespace EncuestasRC.Controllers
             }
 
             return Json(new { result = "200", message = "Success" });
+        }
+
+        [HttpPost]
+        public JsonResult SurveyReportDetailed(int surveyId)
+        {
+            string detailed = "<table width='100%' border=1>";
+
+            try
+            {
+                using (var db = new EncuestaRCEntities())
+                {
+                    var details = (from h in db.SurveyHeaders
+                                   join d in db.SurveyDetails on h.Id equals d.SurveyHeaderId
+                                   join q in db.Questions on d.QuestionId equals q.Id
+                                   join a in db.Answers on d.AnswerId equals a.Id
+                                   where h.SurveyId == surveyId
+                                   orderby d.SurveyHeaderId, d.QuestionId
+                                   select new
+                                   {
+                                       h.Id,
+                                       h.SurveyId,
+                                       h.Customer,
+                                       h.CustomerType,
+                                       h.OrderNo,
+                                       d.Points,
+                                       d.QuestionId,
+                                       questionTitle = q.Title,
+                                       d.AnswerId,
+                                       answerTitle = a.Title,
+                                       date = h.SurveyEnded
+                                   }).ToArray();
+
+                    var questions = db.Questions.Where(q => q.SurveyId == surveyId).OrderBy(o => o.SortIndex).ToArray();
+                    
+                    //HEADER for table
+                    detailed += "<tr>";
+                    detailed += "<td><b>Nombre del Cliente</b></td>";
+                    detailed += "<td><b>Tipo de Cliente</b></td>";
+                    detailed += "<td><b>Orden No.</b></td>";
+                    detailed += "<td><b>Fecha</b></td>";
+
+                    foreach (var question in questions)
+                    {
+                        detailed += "<td><b>" + question.Title + "</b></td>";
+                        var answers = db.Answers.Where(a => a.QuestionId == question.Id);
+                        foreach (var answer in answers)
+                        {
+                            detailed += "<td style='text-align:center'><b>" + answer.Title + "</b></td>";
+                        }
+                    }
+                    detailed += "</tr>";
+
+                    //BODY for table
+                    int index = 1;
+
+                    foreach (var detail in details)
+                    {
+                        if (index == 1) detailed += "<tr>";
+
+                        foreach (var question in questions.Where(q => q.Id == detail.QuestionId))
+                        {
+                            if (index == 1)
+                            {
+
+                                detailed += "<td>" + detail.Customer + "</td>";
+                                detailed += "<td>" + GetCustomerType(detail.CustomerType) + "</td>";
+                                detailed += "<td>" + detail.OrderNo + "</td>";
+                                detailed += "<td>" + detail.date + "</td>";
+                            }
+                            
+                            detailed += "<td>" + question.Title + "</td>";
+
+                            var answers = db.Answers.Where(a => a.QuestionId == question.Id);
+                            foreach (var answer in answers)
+                            {
+                                var selectedAnswer = answer.Id == detail.AnswerId && question.Id == detail.QuestionId ? "<span>X<span>" : "";
+                                detailed += "<td style='text-align:center'>" + selectedAnswer + "</td>";
+                            }
+                        }
+
+                        index = index == 3 ? index = 1 : index + 1;
+                    }
+
+                    detailed += "</tr>";
+
+                    detailed += "</table>";
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "Encuesta Id:" + surveyId);
+
+                return Json(new { result = "500", message = ex.Message });
+            }
+
+            return Json(new { result = "200", message = detailed });
+        }
+
+        private string GetCustomerType(int? id)
+        {
+            if (id == null || id == 0) return "";
+            if (id == 1) return "Minorista";
+            if (id == 2) return "Mayorista";
+            if (id == 3) return "Clave";
+            if (id == 4) return "Esporádico";
+
+            return "";
         }
 
     }

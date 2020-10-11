@@ -82,6 +82,7 @@
                         <option value="1">Minorista</option>
                         <option value="2">Mayorista</option>
                         <option value="3">Clave</option>
+                        <option value="4">Esporádico</option>
                     </select>
                 </div>
             </div>
@@ -270,6 +271,7 @@
         $("#closeSuccessSurvey").click(function (e) {
             e.preventDefault()
             $("#successSurvey").fadeOut();
+            window.location.reload(false);
         });
 
         $("#btnSaveSurvey").click(async function (e) {

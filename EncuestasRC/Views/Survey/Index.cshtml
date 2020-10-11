@@ -31,52 +31,73 @@
                 <th class="text-center">
                     Activa
                 </th>
-                <th  class="text-center">
+                <th class="text-center">
                     Completadas
                 </th>
                 <th>
                     Creada
                 </th>
-
-                <th style="min-width: 130px"></th>
+                <th class="text-center">
+                    Reporte
+                </th>
+                <th class="text-center">
+                    Llenar
+                </th>
+                <th class="text-center">
+                    Editar
+                </th>
+                <th class="text-center">
+                    Eliminar
+                </th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
-                <tr>
-                    <td>@item.Title</td>
-                    <td class="text-center">
-                        @if (item.Active)
-                        {
+            <tr>
+                <td>
+                    <a class="text-dark" href="@Url.Action("New",new { id = @item.Id })">
+                        @item.Title
+                    </a>
+                </td>
+                <td class="text-center">
+                    @if (item.Active)
+                    {
                         <span>Sí</span>
-                        } else
-                        {
+                    }
+                    else
+                    {
                         <span>No</span>
-                        }
-                    </td>
-                    <td class="text-center">
-                        <a class="text-warning font-weight-bold btn btn-outline-dark w-50 completed-effects" href="@Url.Action("CompletedSurveys",new { id = @item.Id })" title="Completadas">
-                            @item.Completed
-                        </a>
-                    </td>
-                    <td>@item.CreateDate</td>
+                    }
+                </td>
+                <td class="text-center">
+                    <a class="text-warning font-weight-bold btn btn-outline-dark w-50 completed-effects" href="@Url.Action("CompletedSurveys",new { id = @item.Id })" title="ver detalle">
+                        @item.Completed
+                    </a>
+                </td>
+                <td>@item.CreateDate</td>
 
-                    <td align="center">
-                        <a class="btn btn-sm btn-warning" href="@Url.Action("Reporte_Encuesta",new { id = @item.Id })" title="Reporte de encuesta">
-                            <i class="fa fa-bar-chart"></i>
-                        </a>
-                        <a class="btn btn-sm btn-info" href="@Url.Action("Completar_Encuesta",new { id = @item.Id })" title="Completar encuesta">
-                            <i class="fa fa-file-text"></i>
-                        </a>
-                        <a class="btn btn-sm btn-success" href="@Url.Action("New",new { id = @item.Id })" title="Editar">
-                            <i class="fa fa-edit"></i>
-                        </a>
-                        <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteSurvey(@item.Id)" title="Eliminar">
-                            <i class="fa fa-remove"></i>
-                        </a>
-                    </td>
-                </tr>
+                <td align="center">
+                    <a class="btn btn-sm btn-warning" href="@Url.Action("Reporte_Encuesta",new { id = @item.Id })" title="Reporte de encuesta">
+                        <i class="fa fa-bar-chart"></i>
+                    </a>
+                </td>
+                <td align="center">
+                    <a class="btn btn-sm btn-info" href="@Url.Action("Completar_Encuesta",new { id = @item.Id })" title="Completar encuesta">
+                        <i class="fa fa-file-text"></i>
+                    </a>
+                </td>
+                <td align="center">
+                    <a class="btn btn-sm btn-success" href="@Url.Action("New",new { id = @item.Id })" title="Editar">
+                        <i class="fa fa-edit"></i>
+                    </a>
+                </td>
+                <td align="center">                    
+                    <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteSurvey(@item.Id)" title="Eliminar">
+                        <i class="fa fa-remove"></i>
+                    </a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
