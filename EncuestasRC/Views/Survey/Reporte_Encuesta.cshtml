@@ -1,5 +1,7 @@
 ﻿@{
     var index = 0;
+    var generalResult = 0;
+
     ViewBag.Title = "Completar Encuesta";
 }
 
@@ -32,7 +34,7 @@
 
     @foreach (var item in ViewBag.Questions)
     {
-        <p class="font-weight-bold bg-light pl-1" id="question@(index)">@(index + 1)-@item.QuestionTitle</p>
+        <p class="font-weight-bold bg-light pl-1" id="question@(index)">@(index + 1)-@item.QuestionTitle <span class="text-info">(@string.Format("{0:###}", item.QuestionAverage) puntos)</span></p>
 
         <table cellpadding="8" class="mb-4">
 
@@ -65,9 +67,14 @@
         </table>
 
         index += 1;
+        generalResult += item.QuestionAverage;
     }
 
-    <button class="btn btn-secondary pl-5 pr-5 mt-3" id="btnBack" onclick="history.back()">Regresar</button>
+    <div class="mt-4 mb-4">
+        <h3>Resultado General: <span class="text-info">@string.Format("{0:###}", generalResult)%</span></h3>
+    </div>
+
+    <button class="btn btn-secondary pl-5 pr-5" id="btnBack" onclick="history.back()">Regresar</button>
 
 </div>
 

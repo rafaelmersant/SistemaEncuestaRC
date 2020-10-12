@@ -18,6 +18,7 @@ namespace EncuestasRC.Controllers
             public int QuestionId { get; set; }
             public string QuestionTitle { get; set; }
             public int QuestionPoints { get; set; }
+            public decimal QuestionAverage { get; set; }
             public List<Answer> Answers { get; set; }
         }
 
@@ -189,11 +190,13 @@ namespace EncuestasRC.Controllers
             return View();
         }
 
-        public ActionResult Reporte_Encuesta(int id)
+        public ActionResult Reporte_Encuesta(int? id)
         {
             try
             {
-                if (Session["role"] == null) return RedirectToAction("Index", "Home");
+                if (Session["role"] == null || id == null) return RedirectToAction("Index", "Home");
+
+                List<QuestionAnswers> _questionsResult = new List<QuestionAnswers>();
 
                 using (var db = new EncuestaRCEntities())
                 {
@@ -210,16 +213,29 @@ namespace EncuestasRC.Controllers
 
                         foreach (var question in _questions)
                         {
+                            var answerMax = db.Answers.Where(a => a.QuestionId == question.QuestionId).OrderByDescending(o => o.Points).FirstOrDefault().Points;
+                            decimal answerSum = 0;
+                            decimal answerCount = 0;
+
                             foreach (var answer in question.Answers)
                             {
-                                var answerTotal = details.Count(a => a.AnswerId == answer.Id);
+                                var _answer = details.Where(a => a.AnswerId == answer.Id);
+                                int answerTotal = _answer.Count();
+
+                                answerCount += answerTotal;
+                                answerSum += _answer.Sum(a => a.Points);
 
                                 _answers.Add(new AnswersPoints() { AnswerId = answer.Id, AnswerPoints = answerTotal });
                             }
+
+                            question.QuestionAverage = ((answerSum / answerCount) / answerMax) * 100;
+                            question.QuestionAverage = Math.Round((question.QuestionAverage * question.QuestionPoints) / 100);
+
+                            _questionsResult.Add(question);
                         }
 
                         ViewBag.Survey = survey;
-                        ViewBag.Questions = _questions;
+                        ViewBag.Questions = _questionsResult;
                         ViewBag.Answers = _answers;
                     }
                 }
