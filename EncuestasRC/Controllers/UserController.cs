@@ -243,7 +243,7 @@ namespace EncuestasRC.Controllers
         {
             IList<SelectListItem> roles = new List<SelectListItem>
             {
-                new SelectListItem() {Text="Consulta", Value="Consulta"},
+                new SelectListItem() {Text="Encuesta", Value="Encuesta"},
                 new SelectListItem() { Text="Admin", Value="Admin"}
             };
             return roles;

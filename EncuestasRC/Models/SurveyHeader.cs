@@ -21,5 +21,6 @@ namespace EncuestasRC.Models
         public string OrderNo { get; set; }
         public Nullable<System.DateTime> SurveyEnded { get; set; }
         public string UserLogged { get; set; }
+        public string Comments { get; set; }
     }
 }

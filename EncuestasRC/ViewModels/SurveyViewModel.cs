@@ -19,9 +19,9 @@ namespace EncuestasRC.ViewModels
         public string CreateBy { get; set; }
         public Nullable<System.DateTime> ModifiedDate { get; set; }
         public string ModifiedBy { get; set; }
-
+        
         public int Completed { get; set; }
-
+        public decimal Result { get; set; }
     }
 
     public class SurveyCompletedViewModel

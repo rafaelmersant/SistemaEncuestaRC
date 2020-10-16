@@ -89,6 +89,7 @@
           <Property Name="OrderNo" Type="varchar" MaxLength="10" />
           <Property Name="SurveyEnded" Type="datetime" />
           <Property Name="UserLogged" Type="varchar" MaxLength="50" />
+          <Property Name="Comments" Type="varchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -222,6 +223,7 @@
           <Property Name="OrderNo" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="SurveyEnded" Type="DateTime" Precision="3" />
           <Property Name="UserLogged" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Comments" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -324,6 +326,7 @@
           <EntitySetMapping Name="SurveyHeaders">
             <EntityTypeMapping TypeName="EncuestaRCModel.SurveyHeader">
               <MappingFragment StoreEntitySet="SurveyHeader">
+                <ScalarProperty Name="Comments" ColumnName="Comments" />
                 <ScalarProperty Name="UserLogged" ColumnName="UserLogged" />
                 <ScalarProperty Name="SurveyEnded" ColumnName="SurveyEnded" />
                 <ScalarProperty Name="OrderNo" ColumnName="OrderNo" />

@@ -32,7 +32,7 @@ namespace EncuestasRC.Controllers
         public ActionResult Index()
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
-            if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
+            //if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
 
             try
             {
@@ -47,6 +47,7 @@ namespace EncuestasRC.Controllers
                     foreach(var survey in surveys)
                     {
                         int completed = allSurveys.Count(s => s.SurveyId == survey.Id);
+                        decimal result = GetSurveyResult(survey.Id);
 
                         SurveyViewModel surveyViewModel = new SurveyViewModel
                         {
@@ -55,7 +56,8 @@ namespace EncuestasRC.Controllers
                             CreateBy = survey.CreateBy,
                             CreateDate = survey.CreateDate,
                             Title = survey.Title,
-                            Completed = completed
+                            Completed = completed,
+                            Result = result
                         };
 
                         surveysModel.Add(surveyViewModel);
@@ -156,10 +158,12 @@ namespace EncuestasRC.Controllers
             return View();
         }
 
-        public ActionResult Encuesta_Completada(int id)
+        public ActionResult Encuesta_Completada(int? id)
         {
             try
             {
+                if (Session["role"] == null || id == null) return RedirectToAction("Index", "Home");
+
                 var surveyCompletedViewModel = new SurveyCompletedViewModel();
 
                 using (var db = new EncuestaRCEntities())
@@ -214,6 +218,8 @@ namespace EncuestasRC.Controllers
                         foreach (var question in _questions)
                         {
                             var answerMax = db.Answers.Where(a => a.QuestionId == question.QuestionId).OrderByDescending(o => o.Points).FirstOrDefault().Points;
+                            //var answerMaxPrevios = db.Answers.Where(a => a.QuestionId == question.QuestionId && a.Id != _answerMax.Id).OrderByDescending(o => o.Points).FirstOrDefault().Points;
+
                             decimal answerSum = 0;
                             decimal answerCount = 0;
 
@@ -590,7 +596,7 @@ namespace EncuestasRC.Controllers
 
         //Save Survey Header
         [HttpPost]
-        public JsonResult SaveSurveyHeader(int Id, int surveyId, string customer, int customerType, string orderNo, string date)
+        public JsonResult SaveSurveyHeader(int Id, int surveyId, string customer, int customerType, string orderNo, string date, string comments)
         {
             SurveyHeader surveyHeader;
 
@@ -605,6 +611,7 @@ namespace EncuestasRC.Controllers
                         surveyHeader.CustomerType = customerType;
                         surveyHeader.OrderNo = orderNo;
                         surveyHeader.SurveyEnded = DateTime.Now;
+                        surveyHeader.Comments = comments;
                     }
                     else
                     {
@@ -615,7 +622,8 @@ namespace EncuestasRC.Controllers
                             CustomerType = customerType,
                             OrderNo = orderNo,
                             SurveyEnded = Convert.ToDateTime(date),
-                            UserLogged = Session["email"] != null ? Session["email"].ToString() : ""
+                            UserLogged = Session["email"] != null ? Session["email"].ToString() : "",
+                            Comments = comments
                         };
                         
                         db.SurveyHeaders.Add(surveyHeader);
@@ -758,6 +766,56 @@ namespace EncuestasRC.Controllers
             }
 
             return Json(new { result = "200", message = detailed });
+        }
+
+        private decimal GetSurveyResult(int surveyId)
+        {
+            decimal result = 0;
+
+            try
+            {
+                using (var db = new EncuestaRCEntities())
+                {
+                    var details = (from h in db.SurveyHeaders
+                                   join d in db.SurveyDetails on h.Id equals d.SurveyHeaderId
+                                   where h.SurveyId == surveyId
+                                   select d).ToList();
+
+
+                    List<QuestionAnswers> _questions = QuestionsWithAnswers(surveyId);
+                    List<AnswersPoints> _answers = new List<AnswersPoints>();
+
+                    foreach (var question in _questions)
+                    {
+                        var answerMax = db.Answers.Where(a => a.QuestionId == question.QuestionId).OrderByDescending(o => o.Points).FirstOrDefault().Points;
+
+                        decimal answerSum = 0;
+                        decimal answerCount = 0;
+
+                        foreach (var answer in question.Answers)
+                        {
+                            var _answer = details.Where(a => a.AnswerId == answer.Id);
+                            int answerTotal = _answer.Count();
+
+                            answerCount += answerTotal;
+                            answerSum += _answer.Sum(a => a.Points);
+                        }
+
+                        question.QuestionAverage = ((answerSum / answerCount) / answerMax) * 100;
+                        question.QuestionAverage = Math.Round((question.QuestionAverage * question.QuestionPoints) / 100);
+
+                        result += question.QuestionAverage;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "Encuesta Id:" + surveyId);
+
+                return 0;
+            }
+
+            return result;
         }
 
         private string GetCustomerType(int? id)

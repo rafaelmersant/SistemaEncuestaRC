@@ -26,3 +26,10 @@ Tasks:
 *****5-Agregar un campo "Tipo" para especificar el tipo de cliente al momento de llegar la encuesta
 
 -Buscar nombre de Cliente por nombre.
+
+
+//////PUNTOS
+*****Usuario en vez de codigo de empleado
+*****Dos perfiles, uno admin y otro completar encuesta.
+******-Agregar una observacion para todas las encuestas
+-Agregar porcentaje en listado de encuesta

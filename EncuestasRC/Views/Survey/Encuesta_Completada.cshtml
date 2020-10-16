@@ -83,10 +83,10 @@
                         var selectedAnswer = Model.surveyDetail.FirstOrDefault(c => c.QuestionId == item.QuestionId && c.AnswerId == answer.Id) != null ? "checked" : "";
 
                         <td>
-                            <input type="radio" name="question@(index)" id="@item.QuestionId" value="@answer.Id" data-bind="@answer.Points" 
+                            <input type="radio" name="question@(index)" id="@item.QuestionId" value="@answer.Id" data-bind="@answer.Points"
                                    @(selectedAnswer)> @answer.Title
-                        </td>
-                    }
+                            </td>
+                        }
                 </tr>
             </tbody>
 
@@ -95,7 +95,12 @@
         index += 1;
     }
 
-    <button class="btn btn-danger pl-5 pr-5" id="btnBack" onclick="history.back()">Regresar</button>
+    <div class="form-group">
+        <label for="comments"><b>Comentarios</b></label>
+        <textarea class="form-control col-12" id="comments" rows="3">@Model.surveyHeader.Comments</textarea>
+    </div>
+
+    <button class="btn btn-danger pl-5 pr-5 mt-2" id="btnBack" onclick="history.back()">Regresar</button>
 </div>
 
 

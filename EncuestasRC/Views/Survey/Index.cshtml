@@ -14,11 +14,13 @@
     <h5 class="panel-title">
         Encuestas
         <div class="btn-group pull-right">
-            <a href="@Url.Action("new")" class="btn btn-danger btn-sm">Nueva Encuesta</a>
+            @if (Session["role"] != null && Session["role"].ToString() == "Admin")
+            {
+                <a href="@Url.Action("new")" class="btn btn-danger btn-sm">Nueva Encuesta</a>
+            }
         </div>
     </h5>
 </div>
-
 
 <div>
 
@@ -34,6 +36,9 @@
                 <th class="text-center">
                     Completadas
                 </th>
+                <th  class="text-center">
+                    Resultado
+                </th>
                 <th>
                     Creada
                 </th>
@@ -43,12 +48,15 @@
                 <th class="text-center">
                     Llenar
                 </th>
-                <th class="text-center">
-                    Editar
-                </th>
-                <th class="text-center">
-                    Eliminar
-                </th>
+                @if (Session["role"] != null && Session["role"].ToString() == "Admin")
+                {
+                    <th class="text-center">
+                        Editar
+                    </th>
+                    <th class="text-center">
+                        Eliminar
+                    </th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -75,28 +83,37 @@
                         @item.Completed
                     </a>
                 </td>
-                <td>@item.CreateDate</td>
+                <td class="text-center">
+                    @if (item.Result > 0)
+                    {
+                    <span>@item.Result%</span>
+                    }
+            </td>
+            <td>@item.CreateDate</td>
 
-                <td align="center">
-                    <a class="btn btn-sm btn-warning" href="@Url.Action("Reporte_Encuesta",new { id = @item.Id })" title="Reporte de encuesta">
-                        <i class="fa fa-bar-chart"></i>
-                    </a>
-                </td>
-                <td align="center">
-                    <a class="btn btn-sm btn-info" href="@Url.Action("Completar_Encuesta",new { id = @item.Id })" title="Completar encuesta">
-                        <i class="fa fa-file-text"></i>
-                    </a>
-                </td>
+            <td align="center">
+                <a class="btn btn-sm btn-warning" href="@Url.Action("Reporte_Encuesta",new { id = @item.Id })" title="Reporte de encuesta">
+                    <i class="fa fa-bar-chart"></i>
+                </a>
+            </td>
+            <td align="center">
+                <a class="btn btn-sm btn-info" href="@Url.Action("Completar_Encuesta",new { id = @item.Id })" title="Completar encuesta">
+                    <i class="fa fa-file-text"></i>
+                </a>
+            </td>
+            @if (Session["role"] != null && Session["role"].ToString() == "Admin")
+            {
                 <td align="center">
                     <a class="btn btn-sm btn-success" href="@Url.Action("New",new { id = @item.Id })" title="Editar">
                         <i class="fa fa-edit"></i>
                     </a>
                 </td>
-                <td align="center">                    
+                <td align="center">
                     <a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="deleteSurvey(@item.Id)" title="Eliminar">
                         <i class="fa fa-remove"></i>
                     </a>
                 </td>
+            }
             </tr>
             }
         </tbody>

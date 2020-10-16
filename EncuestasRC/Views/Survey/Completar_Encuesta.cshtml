@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="col-2">
-                    <input type="text" id="surveyDate" name="surveyDate" value="" class="datepicker form-control form-control-sm" autocomplete="off"/>
+                    <input type="text" id="surveyDate" name="surveyDate" value="" class="datepicker form-control form-control-sm" autocomplete="off" />
                 </div>
             </div>
         </div>
@@ -112,7 +112,12 @@
         index += 1;
     }
 
-    <button class="btn btn-danger pl-5 pr-5" id="btnSaveSurvey">Terminar</button>
+        <div class="form-group">
+            <label for="comments"><b>Comentarios</b></label>
+            <textarea class="form-control col-12" id="comments" rows="3"></textarea>
+        </div>
+
+    <button class="btn btn-danger pl-5 pr-5 mt-2" id="btnSaveSurvey">Terminar</button>
 </div>
 
 <div class="modal" tabindex="-1" role="dialog" id="successSurvey">
@@ -143,8 +148,8 @@
 
 <script type="text/javascript">
 
-    const saveSurvey = (id, surveyId, customer, customerType, orderNo, date) => {
-        const url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&customerType=${customerType}&orderNo=${orderNo}&date=${date}`
+    const saveSurvey = (id, surveyId, customer, customerType, orderNo, date, comments) => {
+        const url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&customerType=${customerType}&orderNo=${orderNo}&date=${date}&comments=${comments}`
 
         $.ajax({
             "url": url,
@@ -287,8 +292,9 @@
             const customerType = $("#customerType").val()
             const orderNo = $("#orderNo").val()
             const date = $(".datepicker").val()
+            const comments = $("#comments").val()
 
-            await saveSurvey(id, surveyId, customer, customerType, orderNo, date);
+            await saveSurvey(id, surveyId, customer, customerType, orderNo, date, comments);
         });
 
     });
