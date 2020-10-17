@@ -143,6 +143,8 @@ namespace EncuestasRC.Controllers
                     Survey survey = db.Surveys.FirstOrDefault(s => s.Id == id);
                     if (survey != null)
                     {
+                        if (!survey.Active) return RedirectToAction("Index", "Survey");
+
                         List<QuestionAnswers> _questions = QuestionsWithAnswers(survey.Id);
 
                         ViewBag.Survey = survey;

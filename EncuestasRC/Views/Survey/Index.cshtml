@@ -97,9 +97,16 @@
                 </a>
             </td>
             <td align="center">
-                <a class="btn btn-sm btn-info" href="@Url.Action("Completar_Encuesta",new { id = @item.Id })" title="Completar encuesta">
-                    <i class="fa fa-file-text"></i>
-                </a>
+                @if (item.Active)
+                {
+                    <a class="btn btn-sm btn-info" href="@Url.Action("Completar_Encuesta",new { id = @item.Id })" title="Completar encuesta">
+                        <i class="fa fa-file-text"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="btn btn-sm btn-dark"> <i class="fa fa-file-text"></i> </span>
+                }
             </td>
             @if (Session["role"] != null && Session["role"].ToString() == "Admin")
             {
