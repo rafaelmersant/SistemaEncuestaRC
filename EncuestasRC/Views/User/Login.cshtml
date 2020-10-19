@@ -15,7 +15,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="inputGroupPrepend2">@@</span>
                     </div>
-                    <input type="text" class="form-control numericOnly" id="username" name="username"
+                    <input type="text" class="form-control" id="username" name="username"
                            placeholder="Usuario" aria-describedby="inputGroupPrepend2" value="@ViewBag.EmployeeId" required autocomplete="off">
                 </div>
             </div>
@@ -54,7 +54,7 @@
         });
 
         $("#username").keypress(function () {
-            if (this.value.length >= 4)
+            if (this.value.length >= 20)
                 return false;
         });
     });

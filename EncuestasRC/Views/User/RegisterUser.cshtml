@@ -18,8 +18,8 @@
             @Html.AntiForgeryToken()
             <div class="form-row">
                 <div class="col-4 mb-3">
-                    <label for="validationDefault01">Código de Empleado</label>
-                    @Html.EditorFor(model => model.EmployeeID, new { htmlAttributes = new { @class = "form-control numericOnly" } })
+                    <label for="validationDefault01">Usuario</label>
+                    @Html.EditorFor(model => model.EmployeeID, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.EmployeeID, "", new { @class = "text-danger" })
                 </div>
                 <div class="col-8 mb-3">
@@ -74,7 +74,7 @@
         });
 
         $("#EmployeeID").keypress(function () {
-            if (this.value.length >= 4)
+            if (this.value.length >= 20)
                 return false;
         });
 
@@ -82,7 +82,7 @@
             if (this.value.length < 4 || this.value === $("#EmployeeID").val()) {
                 $("#createUser").attr("disabled", "disabled");
                 $("#createUser").addClass("disable-button");
-                $("#message").text('Verifique que la contraseña tiene minimo 4 digitos y que no es igual al Código de Empleado.')
+                $("#message").text('Verifique que la contraseña tiene minimo 4 digitos.')
             }
             else {
                 $("#createUser").removeAttr("disabled");

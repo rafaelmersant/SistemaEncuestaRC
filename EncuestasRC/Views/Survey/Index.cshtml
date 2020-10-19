@@ -138,18 +138,20 @@
 
     const deleteSurvey = (id) => {
         if (confirm(`Seguro que desea eliminar esta encuesta?`)) {
-            $.ajax({
-                "url": "/Survey/DeleteSurvey?id=" + id,
-                "type": "POST",
-                "success": function (response) {
-                    if (response.result === "200") {
-                        window.location.reload();
-                    } else {
-                        console.log(response.message);
-                        alert('Hubo un error tratando de eliminar la encuesta (Contacte al administrador del sistema).');
+            if (confirm("Este proceso no podrá ser revertido, una vez eliminada perdera toda la información de la Encuesta. Desea continuar?")) {
+                $.ajax({
+                    "url": "/Survey/DeleteSurvey?id=" + id,
+                    "type": "POST",
+                    "success": function (response) {
+                        if (response.result === "200") {
+                            window.location.reload();
+                        } else {
+                            console.log(response.message);
+                            alert('Hubo un error tratando de eliminar la encuesta (Contacte al administrador del sistema).');
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 

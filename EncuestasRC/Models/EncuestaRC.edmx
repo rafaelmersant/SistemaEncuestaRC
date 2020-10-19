@@ -97,7 +97,7 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="IdHash" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="EmployeeID" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="EmployeeID" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="PasswordHash" Type="varchar" MaxLength="200" />
           <Property Name="Role" Type="varchar" MaxLength="10" />
           <Property Name="Email" Type="varchar" MaxLength="40" />
@@ -120,12 +120,12 @@
         <EntityContainer Name="EncuestaRCEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="LoginHistories" EntityType="EncuestaRCModel.LoginHistory" />
           <EntitySet Name="QuestionTypes" EntityType="EncuestaRCModel.QuestionType" />
-          <EntitySet Name="Users" EntityType="EncuestaRCModel.User" />
           <EntitySet Name="Answers" EntityType="EncuestaRCModel.Answer" />
           <EntitySet Name="Questions" EntityType="EncuestaRCModel.Question" />
           <EntitySet Name="Surveys" EntityType="EncuestaRCModel.Survey" />
           <EntitySet Name="SurveyDetails" EntityType="EncuestaRCModel.SurveyDetail" />
           <EntitySet Name="SurveyHeaders" EntityType="EncuestaRCModel.SurveyHeader" />
+          <EntitySet Name="Users" EntityType="EncuestaRCModel.User" />
         </EntityContainer>
         <EntityType Name="LoginHistory">
           <Key>
@@ -141,18 +141,6 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="description" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-        </EntityType>
-        <EntityType Name="User">
-          <Key>
-            <PropertyRef Name="IdHash" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="IdHash" Type="Guid" Nullable="false" />
-          <Property Name="EmployeeID" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
-          <Property Name="PasswordHash" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="Role" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="Email" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
         <EntityType Name="Answer">
           <Key>
@@ -225,6 +213,18 @@
           <Property Name="UserLogged" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Comments" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="IdHash" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdHash" Type="Guid" Nullable="false" />
+          <Property Name="EmployeeID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Role" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -244,19 +244,6 @@
             <EntityTypeMapping TypeName="EncuestaRCModel.QuestionType">
               <MappingFragment StoreEntitySet="QuestionType">
                 <ScalarProperty Name="description" ColumnName="description" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Users">
-            <EntityTypeMapping TypeName="EncuestaRCModel.User">
-              <MappingFragment StoreEntitySet="User">
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="Role" ColumnName="Role" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
-                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
-                <ScalarProperty Name="IdHash" ColumnName="IdHash" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -333,6 +320,19 @@
                 <ScalarProperty Name="CustomerType" ColumnName="CustomerType" />
                 <ScalarProperty Name="Customer" ColumnName="Customer" />
                 <ScalarProperty Name="SurveyId" ColumnName="SurveyId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="EncuestaRCModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="IdHash" ColumnName="IdHash" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
