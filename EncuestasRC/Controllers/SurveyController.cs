@@ -752,7 +752,7 @@ namespace EncuestasRC.Controllers
                             }
                         }
 
-                        index = index == 3 ? index = 1 : index + 1;
+                        index = index == questions.Count() ? index = 1 : index + 1;
                     }
 
                     detailed += "</tr>";
