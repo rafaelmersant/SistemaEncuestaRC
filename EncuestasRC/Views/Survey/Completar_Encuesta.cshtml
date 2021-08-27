@@ -83,6 +83,7 @@
                         <option value="2">Mayorista</option>
                         <option value="3">Clave</option>
                         <option value="4">Esporádico</option>
+                        <option value="5">Centro de Servicios</option>
                     </select>
                 </div>
             </div>
@@ -264,6 +265,13 @@
                         if (response.result === "200" || response.result === "404") {
 
                             $("#customer").val(response.message);
+
+                            if (response.result === "200") {
+                                const results = response.message.split("-");
+
+                                $("#customer").val(results[0]);
+                                $("#orderNo").val(`${order}-${results[1]}`);
+                            }
                         } else {
                             console.log(response.message);
                             alert('Hubo un error tratando de consultar la orden.');

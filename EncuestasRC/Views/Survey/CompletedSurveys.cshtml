@@ -1,4 +1,5 @@
-﻿@model IEnumerable<EncuestasRC.Models.SurveyHeader>
+﻿@model IEnumerable<EncuestasRC.ViewModels.SurveyListViewModel>
+
 
 @{
     ViewBag.Title = "Encuestas Completadas";
@@ -31,7 +32,9 @@
                 <th>
                     Orden
                 </th>
-
+                <th class="text-center">
+                    Resultado
+                </th>
                 <th class="text-center">
                     Detalle
                 </th>
@@ -65,15 +68,24 @@
                     {
                         <span>Clave</span>
                     }
+                    else if (item.CustomerType == 4)
+                    {
+                        <span>Esporádico</span>
+                    }
+                    else if (item.CustomerType == 5)
+                    {
+                        <span>Centro de Servicios</span>
+                    }
                     else
                     {
                         <span></span>
                     }
                 </td>
                 <td>@item.OrderNo</td>
+                <td class="text-center">@item.Result%</td>
 
                 <td align="center">
-                    <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id })" title="Ver detalles">
+                    <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id, resultado = item.Result })" title="Ver detalles">
                         <i class="fa fa-file-text"></i>
                     </a>
                 </td>

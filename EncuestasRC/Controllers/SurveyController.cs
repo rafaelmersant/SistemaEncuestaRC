@@ -80,13 +80,29 @@ namespace EncuestasRC.Controllers
             {
                 if (Session["role"] == null || id == null) return RedirectToAction("Index", "Home");
 
+                List<SurveyListViewModel> surveyList = new List<SurveyListViewModel>();
+
                 using (var db = new EncuestaRCEntities())
                 {
                     var surveysHeader = db.SurveyHeaders.Where(s => s.SurveyId == id).OrderByDescending(o => o.SurveyEnded).ToList();
+
                     ViewBag.SurveyTitle = db.Surveys.FirstOrDefault(s => s.Id == id).Title;
                     ViewBag.SurveyId = id;
 
-                    return View(surveysHeader);
+                    foreach(var item in surveysHeader)
+                    {
+                        surveyList.Add(new SurveyListViewModel
+                        {
+                            Id = item.Id,
+                            SurveyEnded = item.SurveyEnded,
+                            Customer = item.Customer,
+                            CustomerType = item.CustomerType,
+                            OrderNo = item.OrderNo,
+                            Result = GetSurveyResultByOne(id.Value, item.Id)
+                        });
+                    }
+
+                    return View(surveyList);
                 }
             }
             catch(Exception ex)
@@ -160,7 +176,7 @@ namespace EncuestasRC.Controllers
             return View();
         }
 
-        public ActionResult Encuesta_Completada(int? id)
+        public ActionResult Encuesta_Completada(int? id, decimal Resultado)
         {
             try
             {
@@ -183,6 +199,8 @@ namespace EncuestasRC.Controllers
 
                         var questions = QuestionsWithAnswers(surveyHeader.SurveyId);
                         ViewBag.questions = questions;
+
+                        ViewBag.result = Resultado;
 
                         return View(surveyCompletedViewModel);
                     }
@@ -265,7 +283,7 @@ namespace EncuestasRC.Controllers
             {
                 if (customerNameData.Tables.Count > 0 && customerNameData.Tables[0].Rows.Count > 0)
                 {
-                    return Json(new { result = "200", message = customerNameData.Tables[0].Rows[0].ItemArray[0].ToString() });
+                    return Json(new { result = "200", message = $"{customerNameData.Tables[0].Rows[0].ItemArray[0].ToString()}-{customerNameData.Tables[0].Rows[0].ItemArray[3].ToString()}"});
                 }
             }
             catch (Exception ex)
@@ -781,6 +799,56 @@ namespace EncuestasRC.Controllers
                     var details = (from h in db.SurveyHeaders
                                    join d in db.SurveyDetails on h.Id equals d.SurveyHeaderId
                                    where h.SurveyId == surveyId
+                                   select d).ToList();
+
+
+                    List<QuestionAnswers> _questions = QuestionsWithAnswers(surveyId);
+                    List<AnswersPoints> _answers = new List<AnswersPoints>();
+
+                    foreach (var question in _questions)
+                    {
+                        var answerMax = db.Answers.Where(a => a.QuestionId == question.QuestionId).OrderByDescending(o => o.Points).FirstOrDefault().Points;
+
+                        decimal answerSum = 0;
+                        decimal answerCount = 0;
+
+                        foreach (var answer in question.Answers)
+                        {
+                            var _answer = details.Where(a => a.AnswerId == answer.Id);
+                            int answerTotal = _answer.Count();
+
+                            answerCount += answerTotal;
+                            answerSum += _answer.Sum(a => a.Points);
+                        }
+
+                        question.QuestionAverage = ((answerSum / answerCount) / answerMax) * 100;
+                        question.QuestionAverage = Math.Round((question.QuestionAverage * question.QuestionPoints) / 100);
+
+                        result += question.QuestionAverage;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "Encuesta Id:" + surveyId);
+
+                return 0;
+            }
+
+            return result;
+        }
+
+        public decimal GetSurveyResultByOne(int surveyId, int surveyIdHeader)
+        {
+            decimal result = 0;
+
+            try
+            {
+                using (var db = new EncuestaRCEntities())
+                {
+                    var details = (from h in db.SurveyHeaders
+                                   join d in db.SurveyDetails on h.Id equals d.SurveyHeaderId
+                                   where h.Id == surveyIdHeader
                                    select d).ToList();
 
 

@@ -30,4 +30,14 @@ namespace EncuestasRC.ViewModels
         public SurveyHeader surveyHeader { get; set; }
         public List<SurveyDetail> surveyDetail { get; set; }
     }
+
+    public class SurveyListViewModel
+    {
+        public int Id { get; set; }
+        public DateTime? SurveyEnded { get; set; }
+        public string Customer { get; set; }
+        public int? CustomerType { get; set; }
+        public string OrderNo { get; set; }
+        public decimal? Result { get; set; }
+    }
 }
