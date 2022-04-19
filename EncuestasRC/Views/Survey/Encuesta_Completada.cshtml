@@ -8,6 +8,7 @@
 <div class="text-center">
     <h2 class="bg-dark text-light rounded pl-2">@Model.Title</h2>
     <input type="hidden" id="surveyId" name="SurveyId" value="@Model.surveyHeader.SurveyId" />
+    <input type="hidden" id="sessionRole" name="sessionRole" value="@Session["role"].ToString()" />
 </div>
 
 <div class="mt-5" id="surveyDiv">
@@ -19,7 +20,7 @@
                 </div>
 
                 <div class="col-2">
-                    <input type="text" id="surveyDate" name="surveyDate" value="@Model.surveyHeader.SurveyEnded.Value.Date.ToString("MM/dd/yyyy")" class="datepicker form-control form-control-sm" autocomplete="off" />
+                    <input type="text" id="surveyDate" name="surveyDate" value="@Model.surveyHeader.SurveyEnded.Value.Date.ToString("MM/dd/yyyy")" class="datepicker form-control form-control-sm" autocomplete="off" readonly />
                 </div>
             </div>
         </div>
@@ -63,6 +64,8 @@
                         <option value="1">Minorista</option>
                         <option value="2">Mayorista</option>
                         <option value="3">Clave</option>
+                        <option value="4">Esporádico</option>
+                        <option value="5">Centro de Servicios</option>
                     </select>
                 </div>
             </div>
@@ -104,7 +107,16 @@
         <h3>Resultado: @ViewBag.result%</h3>
     </div>
 
-    <button class="btn btn-danger pl-5 pr-5 mt-2" id="btnBack" onclick="history.back()">Regresar</button>
+    <button class="btn btn-secondary pl-5 pr-5 mt-2" id="btnBack" onclick="history.back()">Regresar</button>
+
+    @{
+        if (Session["role"] != null && Session["role"].ToString() == "Admin2")
+        {
+            <button class="btn btn-info pl-5 pr-5 mt-2" id="btnSaveSurvey">Guardar</button>
+            <button class="btn btn-danger pl-5 pr-5 mt-2" id="btnRemove">Eliminar</button>
+        }
+    }
+
 </div>
 
 
@@ -114,20 +126,174 @@
 
 <script type="text/javascript">
 
+    function goBack() {
+        const mainSurvey = window.location.href.split("/").pop().split("=")[2];
+        window.location = `/survey/CompletedSurveys/${mainSurvey}`;
+    }
+
+    const saveSurvey = (id, surveyId, customer, customerType, orderNo, date, comments) => {
+        const formattedDate = GetDateFormat(date);
+
+        const url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&customerType=${customerType}&orderNo=${orderNo}&date=${formattedDate}&comments=${comments}`
+
+        $.ajax({
+            "url": url,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+
+                    console.log('header saved')
+                    const surveyHeaderId = response.message
+
+                    for (let index = 0; index < @index; index++) {
+                        if ($(`input[name='question${index}']:checked`).val() !== undefined) {
+                            const questionId = $(`input[name='question${index}']:checked`).attr("id")
+                            const answerId = $(`input[name='question${index}']:checked`).attr("value")
+                            const points = $(`input[name='question${index}']:checked`).attr("data-bind")
+
+                            await saveSurveyDetail(surveyHeaderId, questionId, answerId, points)
+
+                            $("#surveyDiv :input[type=text]").prop("disabled", true);
+                            $("#customerType").prop("disabled", true);
+                            $(':radio:not(:checked)').attr('disabled', true);
+                            $("#btnSearchOrder").addClass("button-disabled");
+                            $("#btnSaveSurvey").addClass("button-disabled");
+                            $("#successSurvey").fadeIn();
+                        }
+                    }
+
+                    alert("Los cambios fueron guardados!");
+                    goBack();
+
+                    $("#btnSaveSurvey").removeAttr('disabled')
+
+                } else {
+                    console.log(response.message);
+                    $("#btnSaveSurvey").removeAttr('disabled')
+                    alert('Hubo un error tratando de guardar la respuesta.');
+                }
+            }
+        });
+    }
+
+    const saveSurveyDetail = async (surveyHeaderId, questionId, answerId, points) => {
+        const url = `/Survey/SaveSurveyDetail?surveyHeaderId=${surveyHeaderId}&questionId=${questionId}&answerId=${answerId}&points=${points}`
+
+        $.ajax({
+            "url": url,
+            "type": "POST",
+            "success": async function (response) {
+                if (response.result === "200") {
+
+                    console.log('detail saved')
+                    $("#btnSaveSurvey").removeAttr('disabled')
+
+                } else {
+                    console.log(response.message);
+                    $("#btnSaveSurvey").removeAttr('disabled')
+                    alert('Hubo un error tratando de guardar la respuesta.');
+                }
+            }
+        });
+    }
 
     $(document).ready(function () {
 
         $(".numericOnly").keypress(function (e) {
             if (String.fromCharCode(e.keyCode).match(/[^0-9]/g)) return false
         });
-        
-        $("#surveyDiv :input[type=text]").prop("disabled", true);
-        $("#customerType").prop("disabled", true);
-        $(':radio:not(:checked)').attr('disabled', true);
 
-        
+        if ($("#sessionRole").val() !== "Admin2") {
+            $("#surveyDiv :input[type=text]").prop("disabled", true);
+            $("#customerType").prop("disabled", true);
+            $(':radio:not(:checked)').attr('disabled', true);
+        }
+
         $("#customerType").val(@Model.surveyHeader.CustomerType);
-        
+
+        $("#btnRemove").click(function (evt) {
+            evt.preventDefault();
+            const id = window.location.href.split("/").pop().split("?")[0];
+
+            if (confirm(`Favor confirmar que desea eliminar la encuesta #${id}`)) {
+                $.ajax({
+                    "url": `/Survey/RemoveCompletedSurvey?id=${id}`,
+                    "type": "POST",
+                    "success": async function (response) {
+                        if (response.result === "200") {
+                            alert(`Encuesta #${id} fue eliminada con exito!`);
+                            goBack();
+                        } else {
+                            console.log(response.message);
+                            alert('Hubo un error tratando de eliminar la encuesta.');
+                        }
+                    }
+                });
+            }
+        });
+
+        $("#btnSearchOrder").click(function (e) {
+            e.preventDefault();
+            console.log('searching')
+            const order = $("#orderNo").val();
+
+            if (order) {
+                $.ajax({
+                    "url": `/Survey/CustomerNameForOrder?order=${order}`,
+                    "type": "POST",
+                    "success": async function (response) {
+                        if (response.result === "200" || response.result === "404") {
+
+                            $("#customer").val(response.message);
+
+                            if (response.result === "200") {
+                                const results = response.message.split("-");
+
+                                $("#customer").val(results[0]);
+                                $("#orderNo").val(`${results[2]}-${results[1]}`);
+                            }
+                        } else {
+                            console.log(response.message);
+                            alert('Hubo un error tratando de consultar la orden.');
+                        }
+                    }
+                });
+            }
+        });
+
+        $("#btnSaveSurvey").click(async function (e) {
+            e.preventDefault()
+
+            $("#btnSaveSurvey").attr('disabled', 'disabled')
+
+            const id = window.location.href.split("/").pop().split("?")[0];
+            const surveyId = $("#surveyId").val();
+            const customer = $("#customer").val();
+            const customerType = $("#customerType").val();
+            const orderNo = $("#orderNo").val();
+            const date = $(".datepicker").val();
+            const comments = $("#comments").val();
+
+            await saveSurvey(id, surveyId, customer, customerType, orderNo, date, comments);
+        });
     });
+
+    function GetDateFormat(date) {
+        if (navigator.languages != null && navigator.languages[0].includes("es")) {
+            const parts = date.split("/");
+            const dt = new Date(parseInt(parts[2], 10),
+                parseInt(parts[1], 10) - 1,
+                parseInt(parts[0], 10));
+
+            return dt.toLocaleString("en-US")
+        } else {
+            const parts = date.split("/");
+            const dt = new Date(parseInt(parts[2], 10),
+                parseInt(parts[1], 10) - 1,
+                parseInt(parts[0], 10));
+
+            return dt.toLocaleDateString();
+        }
+    }
 
 </script>

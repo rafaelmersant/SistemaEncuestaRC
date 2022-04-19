@@ -116,7 +116,7 @@ namespace EncuestasRC.Controllers
         public ActionResult New(int? id)
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
-            if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
+            if (!Session["role"].ToString().Contains("Admin")) return RedirectToAction("Index", "Home");
 
             ViewBag.surveyId = 0;
 
@@ -283,7 +283,8 @@ namespace EncuestasRC.Controllers
             {
                 if (customerNameData.Tables.Count > 0 && customerNameData.Tables[0].Rows.Count > 0)
                 {
-                    return Json(new { result = "200", message = $"{customerNameData.Tables[0].Rows[0].ItemArray[0].ToString()}-{customerNameData.Tables[0].Rows[0].ItemArray[3].ToString()}"});
+                    return Json(new { result = "200", 
+                        message = $"{customerNameData.Tables[0].Rows[0].ItemArray[0]}-{customerNameData.Tables[0].Rows[0].ItemArray[3]}-{customerNameData.Tables[0].Rows[0].ItemArray[4]}"});
                 }
             }
             catch (Exception ex)
@@ -295,6 +296,46 @@ namespace EncuestasRC.Controllers
 
             return Json(new { result = "404", message = "No encontrado" });
         }
+
+        [HttpPost]
+        public JsonResult RemoveCompletedSurvey(int id)
+        {
+            try
+            {
+                using (var db = new EncuestaRCEntities())
+                {
+                    var surveyHeader = db.SurveyHeaders.FirstOrDefault(h => h.Id == id);
+                    var surveyDetail = db.SurveyDetails.Where(d => d.SurveyHeaderId == id).ToList();
+
+                    if (surveyHeader != null && surveyDetail.Count() > 0)
+                    {
+                        foreach (var item in surveyDetail)
+                        {
+                            db.SurveyDetails.Remove(item);
+                            db.SaveChanges();
+                        }
+
+                        db.SurveyHeaders.Remove(surveyHeader);
+                        db.SaveChanges();
+
+                        return Json(new
+                        {
+                            result = "200",
+                            message = "La encuesta fue eliminada"
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Helper.SendException(ex, "id:" + id);
+
+                return Json(new { result = "500", message = ex.Message });
+            }
+
+            return Json(new { result = "404", message = "No encontrada" });
+        }
+
 
         [HttpPost]
         public JsonResult NewSurvey(string title, bool active)
@@ -630,7 +671,7 @@ namespace EncuestasRC.Controllers
                         surveyHeader.Customer = customer;
                         surveyHeader.CustomerType = customerType;
                         surveyHeader.OrderNo = orderNo;
-                        surveyHeader.SurveyEnded = DateTime.Now;
+                        //surveyHeader.SurveyEnded = DateTime.Now;
                         surveyHeader.Comments = comments;
                     }
                     else
@@ -670,15 +711,24 @@ namespace EncuestasRC.Controllers
             {
                 using (var db = new EncuestaRCEntities())
                 {
-                    db.SurveyDetails.Add(new SurveyDetail
+                    var surveyDetail = db.SurveyDetails.FirstOrDefault(a => a.SurveyHeaderId == surveyHeaderId && a.QuestionId == questionId);
+                    if (surveyDetail != null)
                     {
-                        SurveyHeaderId = surveyHeaderId,
-                        QuestionId = questionId,
-                        AnswerId = answerId,
-                        Points = points,
-                        CreationDate = DateTime.Now
-                    });
-
+                        surveyDetail.AnswerId = answerId;
+                        surveyDetail.Points = points;
+                    }
+                    else
+                    {
+                        db.SurveyDetails.Add(new SurveyDetail
+                        {
+                            SurveyHeaderId = surveyHeaderId,
+                            QuestionId = questionId,
+                            AnswerId = answerId,
+                            Points = points,
+                            CreationDate = DateTime.Now
+                        });
+                    }
+                    
                     db.SaveChanges();
                 }
             }

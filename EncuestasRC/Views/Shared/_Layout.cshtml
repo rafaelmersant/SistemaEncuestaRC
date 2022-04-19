@@ -23,7 +23,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
 
                 <ul class="navbar-nav">
-                    @if (Session["role"] != null && Session["role"].ToString() == "Admin")
+                    @if (Session["role"] != null && Session["role"].ToString().Contains("Admin"))
                     {
                         <li class="nav-item"><a href="/survey/" class="nav-link">Encuestas</a></li>
                         <li class="nav-item"><a href="/user/UsersList" class="nav-link">Usuarios</a></li>

@@ -78,11 +78,15 @@ namespace EncuestasRC.Controllers
         public ActionResult UsersList()
         {
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
-            if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
+            if (!Session["role"].ToString().Contains("Admin")) return RedirectToAction("Index", "Home");
 
             using (var db = new EncuestaRCEntities())
             {
                 var users = db.Users.OrderByDescending(o => o.CreatedDate).ToList();
+
+                if (Session["role"].ToString() == "Admin")
+                    users = users.Where(u => u.Role != "Admin2").ToList();
+
                 return View(users);
             }
         }
@@ -146,7 +150,7 @@ namespace EncuestasRC.Controllers
 
         public ActionResult Edit(Guid? IdHash)
         {
-            if (Session["role"] != null && Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
+            if (Session["role"] != null && !Session["role"].ToString().Contains("Admin")) return RedirectToAction("Index", "Home");
 
             ViewBag.Roles = GetRoles();
 
@@ -246,6 +250,10 @@ namespace EncuestasRC.Controllers
                 new SelectListItem() {Text="Encuesta", Value="Encuesta"},
                 new SelectListItem() { Text="Admin", Value="Admin"}
             };
+
+            if (Session["role"] != null && Session["role"].ToString() == "Admin2")
+                roles.Add(new SelectListItem() { Text = "Admin Senior", Value = "Admin2" });
+
             return roles;
         }
 

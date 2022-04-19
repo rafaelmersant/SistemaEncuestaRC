@@ -14,7 +14,7 @@
     <h5 class="panel-title">
         Encuestas
         <div class="btn-group pull-right">
-            @if (Session["role"] != null && Session["role"].ToString() == "Admin")
+            @if (Session["role"] != null && Session["role"].ToString().Contains("Admin"))
             {
                 <a href="@Url.Action("new")" class="btn btn-danger btn-sm">Nueva Encuesta</a>
             }
@@ -48,7 +48,7 @@
                 <th class="text-center">
                     Llenar
                 </th>
-                @if (Session["role"] != null && Session["role"].ToString() == "Admin")
+                @if (Session["role"] != null && Session["role"].ToString().Contains("Admin"))
                 {
                     <th class="text-center">
                         Editar
@@ -108,7 +108,7 @@
                     <span class="btn btn-sm btn-dark"> <i class="fa fa-file-text"></i> </span>
                 }
             </td>
-            @if (Session["role"] != null && Session["role"].ToString() == "Admin")
+            @if (Session["role"] != null && Session["role"].ToString().Contains("Admin"))
             {
                 <td align="center">
                     <a class="btn btn-sm btn-success" href="@Url.Action("New",new { id = @item.Id })" title="Editar">

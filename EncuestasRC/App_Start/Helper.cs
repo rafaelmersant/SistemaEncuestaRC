@@ -184,9 +184,9 @@ namespace EncuestasRC.App_Start
             }
                 
             if (string.IsNullOrEmpty(orderType))
-                sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura, OSTIDO OrdenTipo FROM [QS36F.RCOSMF00] WHERE OSNUOS = " + orderNo;
+                sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura, OSTIDO OrdenTipo, OSNUOS FROM [QS36F.RCOSMF00] WHERE OSNUOS = " + orderNo;
             else 
-                sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura, OSTIDO OrdenTipo FROM [QS36F.RCOSMF00] WHERE OSTIDO IN ('" + orderType + "') AND OSNUOS = " + orderNo;
+                sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura, OSTIDO OrdenTipo, OSNUOS FROM [QS36F.RCOSMF00] WHERE OSTIDO IN ('" + orderType + "') AND OSNUOS = " + orderNo;
 
             if (environmentID != "DEV")
                 sQuery = sQuery.Replace("[", "").Replace("]", "");

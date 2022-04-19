@@ -85,7 +85,7 @@
                 <td class="text-center">@item.Result%</td>
 
                 <td align="center">
-                    <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id, resultado = item.Result })" title="Ver detalles">
+                    <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id, resultado = item.Result, main = ViewBag.SurveyId })" title="Ver detalles">
                         <i class="fa fa-file-text"></i>
                     </a>
                 </td>
