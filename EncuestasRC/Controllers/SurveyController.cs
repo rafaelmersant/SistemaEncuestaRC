@@ -74,7 +74,7 @@ namespace EncuestasRC.Controllers
             return View();
         }
 
-        public ActionResult CompletedSurveys(int? id)
+        public ActionResult CompletedSurveys(int? id, DateTime? startDate = null, DateTime? endDate = null)
         {
             try
             {
@@ -84,7 +84,10 @@ namespace EncuestasRC.Controllers
 
                 using (var db = new EncuestaRCEntities())
                 {
-                    var surveysHeader = db.SurveyHeaders.Where(s => s.SurveyId == id).OrderByDescending(o => o.SurveyEnded).ToList();
+                    startDate = startDate == null ? DateTime.Today.AddDays(-30) : startDate;
+                    endDate = endDate == null ? DateTime.Today : endDate;
+    
+                    var surveysHeader = db.SurveyHeaders.Where(s => s.SurveyId == id && s.SurveyEnded >= startDate && s.SurveyEnded <= endDate).OrderByDescending(o => o.SurveyEnded).ToList();
 
                     ViewBag.SurveyTitle = db.Surveys.FirstOrDefault(s => s.Id == id).Title;
                     ViewBag.SurveyId = id;
@@ -101,6 +104,9 @@ namespace EncuestasRC.Controllers
                             Result = GetSurveyResultByOne(id.Value, item.Id)
                         });
                     }
+
+                    ViewBag.startDate = startDate == null ? DateTime.Today.ToShortDateString() : startDate.Value.ToShortDateString();
+                    ViewBag.endDate = endDate == null ? DateTime.Today.ToShortDateString() : endDate.Value.ToShortDateString();
 
                     return View(surveyList);
                 }
@@ -743,7 +749,7 @@ namespace EncuestasRC.Controllers
         }
 
         [HttpPost]
-        public JsonResult SurveyReportDetailed(int surveyId)
+        public JsonResult SurveyReportDetailed(int surveyId, DateTime startDate, DateTime endDate)
         {
             string detailed = "<table width='100%' border=1>";
 
@@ -755,7 +761,7 @@ namespace EncuestasRC.Controllers
                                    join d in db.SurveyDetails on h.Id equals d.SurveyHeaderId
                                    join q in db.Questions on d.QuestionId equals q.Id
                                    join a in db.Answers on d.AnswerId equals a.Id
-                                   where h.SurveyId == surveyId
+                                   where h.SurveyId == surveyId && h.SurveyEnded >= startDate && h.SurveyEnded <= endDate
                                    orderby d.SurveyHeaderId, d.QuestionId
                                    select new
                                    {
@@ -780,6 +786,7 @@ namespace EncuestasRC.Controllers
                     detailed += "<td><b>Tipo de Cliente</b></td>";
                     detailed += "<td><b>Orden No.</b></td>";
                     detailed += "<td><b>Fecha</b></td>";
+                    detailed += "<td><b>Resultado %</b></td>";
 
                     foreach (var question in questions)
                     {
@@ -808,6 +815,7 @@ namespace EncuestasRC.Controllers
                                 detailed += "<td>" + GetCustomerType(detail.CustomerType) + "</td>";
                                 detailed += "<td>" + detail.OrderNo + "</td>";
                                 detailed += "<td>" + detail.date + "</td>";
+                                detailed += "<td>" + GetSurveyResultByOne(detail.SurveyId, detail.Id) + "</td>";
                             }
                             
                             detailed += "<td>" + question.Title + "</td>";
