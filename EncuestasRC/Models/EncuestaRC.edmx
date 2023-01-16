@@ -86,7 +86,7 @@
           <Property Name="SurveyId" Type="int" Nullable="false" />
           <Property Name="Customer" Type="varchar" MaxLength="100" />
           <Property Name="CustomerType" Type="int" />
-          <Property Name="OrderNo" Type="varchar" MaxLength="10" />
+          <Property Name="OrderNo" Type="varchar" MaxLength="15" />
           <Property Name="SurveyEnded" Type="datetime" />
           <Property Name="UserLogged" Type="varchar" MaxLength="50" />
           <Property Name="Comments" Type="varchar" MaxLength="500" />
@@ -124,8 +124,8 @@
           <EntitySet Name="Questions" EntityType="EncuestaRCModel.Question" />
           <EntitySet Name="Surveys" EntityType="EncuestaRCModel.Survey" />
           <EntitySet Name="SurveyDetails" EntityType="EncuestaRCModel.SurveyDetail" />
-          <EntitySet Name="SurveyHeaders" EntityType="EncuestaRCModel.SurveyHeader" />
           <EntitySet Name="Users" EntityType="EncuestaRCModel.User" />
+          <EntitySet Name="SurveyHeaders" EntityType="EncuestaRCModel.SurveyHeader" />
         </EntityContainer>
         <EntityType Name="LoginHistory">
           <Key>
@@ -200,19 +200,6 @@
           <Property Name="Points" Type="Int32" Nullable="false" />
           <Property Name="CreationDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
-        <EntityType Name="SurveyHeader">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="SurveyId" Type="Int32" Nullable="false" />
-          <Property Name="Customer" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="CustomerType" Type="Int32" />
-          <Property Name="OrderNo" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="SurveyEnded" Type="DateTime" Precision="3" />
-          <Property Name="UserLogged" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Comments" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-        </EntityType>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="IdHash" />
@@ -224,6 +211,19 @@
           <Property Name="Role" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="Email" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
           <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="SurveyHeader">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SurveyId" Type="Int32" Nullable="false" />
+          <Property Name="Customer" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CustomerType" Type="Int32" />
+          <Property Name="OrderNo" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="SurveyEnded" Type="DateTime" Precision="3" />
+          <Property Name="UserLogged" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Comments" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -310,6 +310,19 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="EncuestaRCModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="IdHash" ColumnName="IdHash" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="SurveyHeaders">
             <EntityTypeMapping TypeName="EncuestaRCModel.SurveyHeader">
               <MappingFragment StoreEntitySet="SurveyHeader">
@@ -320,19 +333,6 @@
                 <ScalarProperty Name="CustomerType" ColumnName="CustomerType" />
                 <ScalarProperty Name="Customer" ColumnName="Customer" />
                 <ScalarProperty Name="SurveyId" ColumnName="SurveyId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Users">
-            <EntityTypeMapping TypeName="EncuestaRCModel.User">
-              <MappingFragment StoreEntitySet="User">
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="Role" ColumnName="Role" />
-                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
-                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
-                <ScalarProperty Name="IdHash" ColumnName="IdHash" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
