@@ -172,26 +172,33 @@ namespace EncuestasRC.App_Start
 
         public static DataSet GetCustomerName(string order)
         {
-            string orderNo = order;
-            string orderType = string.Empty;
-            string sQuery = string.Empty;
-            string environmentID = ConfigurationManager.AppSettings["EnvironmentEncuestas"];
-
-            if (order.Contains("-"))
+            try
             {
-                orderNo = order.Split('-')[0];
-                orderType = order.Split('-')[1];
+                string orderNo = order;
+                string orderType = string.Empty;
+                string sQuery = string.Empty;
+                string environmentID = ConfigurationManager.AppSettings["EnvironmentEncuestas"];
+
+                if (order.Contains("-"))
+                {
+                    orderNo = order.Split('-')[0];
+                    orderType = order.Split('-')[1];
+                }
+
+                if (string.IsNullOrEmpty(orderType))
+                    sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura, OSTIDO OrdenTipo, OSNUOS, OSFECE, OSFENT FROM [QS36F.RCOSMF00] WHERE OSNUOS = " + orderNo;
+                else
+                    sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura, OSTIDO OrdenTipo, OSNUOS, OSFECE, OSFENT FROM [QS36F.RCOSMF00] WHERE OSTIDO IN ('" + orderType + "') AND OSNUOS = " + orderNo;
+
+                if (environmentID != "DEV")
+                    sQuery = sQuery.Replace("[", "").Replace("]", "");
+
+                return ExecuteDataSetODBC(sQuery, null);
             }
-                
-            if (string.IsNullOrEmpty(orderType))
-                sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura, OSTIDO OrdenTipo, OSNUOS FROM [QS36F.RCOSMF00] WHERE OSNUOS = " + orderNo;
-            else 
-                sQuery = "SELECT OSNOMC as nombreCte, OSTIFT as TipoFactura, OSFACO as NoFactura, OSTIDO OrdenTipo, OSNUOS FROM [QS36F.RCOSMF00] WHERE OSTIDO IN ('" + orderType + "') AND OSNUOS = " + orderNo;
-
-            if (environmentID != "DEV")
-                sQuery = sQuery.Replace("[", "").Replace("]", "");
-
-            return ExecuteDataSetODBC(sQuery, null);
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public static DataSet ExecuteDataSetODBC(string query, OdbcParameter[] parameters = null)

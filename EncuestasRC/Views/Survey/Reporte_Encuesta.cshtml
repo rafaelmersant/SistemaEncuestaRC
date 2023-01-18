@@ -44,6 +44,7 @@
                 {
                     IEnumerable<dynamic> answers = ViewBag.Answers;
                     var points = answers.FirstOrDefault(a => a.AnswerId == answer.Id).AnswerPoints;
+                    var width = points > 88 ? 88 : points;
 
                     <tr>
                         <td>
@@ -51,7 +52,7 @@
                         </td>
                         <td width="80%">
                             <div class="w-100 row">
-                                <div class="ml-1 bg-danger text-right" style="width:@(points)%"><span class="text-dark"></span></div>
+                                <div class="ml-1 bg-danger text-right" style="width:@(width)%"><span class="text-dark"></span></div>
                                 <div class="col">
                                     <span class="text-info">@points</span>
                                 </div>

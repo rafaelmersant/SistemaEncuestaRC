@@ -16,7 +16,23 @@
 </div>
 
 <div class="container mb-4">
-    <div class="row">
+    <div class="row mb-3">
+
+        <div class="col-12">
+            <div class="form-row">
+                <div class="col-1">
+                    <label class="col-form-label col-form-label-sm">Filtrar por</label>
+                </div>
+
+                <div class="col-2">
+                    <select class="form-control form-control-sm" id="filterBy">
+                        <option value="1">Fecha de Creación</option>
+                        <option value="2">Fecha de Entrega</option>
+                        <option value="3">Fecha de Cierre</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
         <div class="col-12">
             <div class="form-row">
@@ -33,7 +49,7 @@
         <div class="col-12">
             <div class="form-row">
                 <div class="col-1">
-                    <label class="col-form-label col-form-label-sm">Fecha Inicio</label>
+                    <label class="col-form-label col-form-label-sm">Fecha Fin</label>
                 </div>
 
                 <div class="col-2">
@@ -42,7 +58,7 @@
             </div>
         </div>
 
-        <div class="col-6">
+        <div class="col-6 d-flex align-items-center">
             <button class="btn btn-danger pl-5 pr-5 mt-2" id="btnFiltrar">Filtrar</button>
         </div>
     </div>
@@ -66,6 +82,12 @@
                 <th>
                     Orden
                 </th>
+                <th>
+                    Fecha de Entrega
+                </th>
+                <th>
+                    Fecha de Cierre
+                </th>
                 <th class="text-center">
                     Resultado
                 </th>
@@ -77,53 +99,55 @@
         <tbody>
             @foreach (var item in Model)
             {
-                <tr>
-                    <td>@item.SurveyEnded.Value.Date.ToString("MM/dd/yyyy")</td>
-                    <td>
-                        @if (string.IsNullOrEmpty(item.Customer))
-                        {
-                            <span>Anónimo</span>
-                        }
-                        else
-                        {
-                            <span>@item.Customer</span>
-                        }
-                    </td>
-                    <td>
-                        @if (item.CustomerType == 1)
-                        {
-                            <span>Minorista</span>
-                        }
-                        else if (item.CustomerType == 2)
-                        {
-                            <span>Mayorista</span>
-                        }
-                        else if (item.CustomerType == 3)
-                        {
-                            <span>Clave</span>
-                        }
-                        else if (item.CustomerType == 4)
-                        {
-                            <span>Esporádico</span>
-                        }
-                        else if (item.CustomerType == 5)
-                        {
-                            <span>Centro de Servicios</span>
-                        }
-                        else
-                        {
-                            <span></span>
-                        }
-                    </td>
-                    <td>@item.OrderNo</td>
-                    <td class="text-center">@item.Result%</td>
+            <tr>
+                <td>@item.SurveyEnded.Value.Date.ToString("dd/MM/yyyy")</td>
+                <td>
+                    @if (string.IsNullOrEmpty(item.Customer))
+                    {
+                        <span>Anónimo</span>
+                    }
+                    else
+                    {
+                        <span>@item.Customer</span>
+                    }
+                </td>
+                <td>
+                    @if (item.CustomerType == 1)
+                    {
+                        <span>Minorista</span>
+                    }
+                    else if (item.CustomerType == 2)
+                    {
+                        <span>Mayorista</span>
+                    }
+                    else if (item.CustomerType == 3)
+                    {
+                        <span>Clave</span>
+                    }
+                    else if (item.CustomerType == 4)
+                    {
+                        <span>Esporádico</span>
+                    }
+                    else if (item.CustomerType == 5)
+                    {
+                        <span>Centro de Servicios</span>
+                    }
+                    else
+                    {
+                        <span></span>
+                    }
+                </td>
+                <td>@item.OrderNo</td>
+                <td>@(item.DeliveryDate?.Date.ToString("dd/MM/yyyy"))</td>
+                <td>@(item.CloseDate?.Date.ToString("dd/MM/yyyy"))</td>
+                <td class="text-center">@item.Result%</td>
 
-                    <td align="center">
-                        <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id, resultado = item.Result, main = ViewBag.SurveyId })" title="Ver detalles">
-                            <i class="fa fa-file-text"></i>
-                        </a>
-                    </td>
-                </tr>
+                <td align="center">
+                    <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id, resultado = item.Result, main = ViewBag.SurveyId })" title="Ver detalles">
+                        <i class="fa fa-file-text"></i>
+                    </a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
@@ -158,11 +182,16 @@
     }
 
     $(document).ready(function () {
-        $(".datepicker").datepicker();
+        $(".datepicker").datepicker({
+            dateFormat: "dd/mm/yy"
+        });
 
         surveysTable = $("#surveysTable").DataTable({
             "order": [[0, "desc"]]
         });
+
+        const filterBy = @ViewBag.FilterBy;
+        $(`#filterBy option[value='${filterBy}'`).attr('selected', 'selected');
 
         $("#exportToExcel").click(function (e) {
             e.preventDefault();
@@ -170,10 +199,17 @@
             const surveyId = $("#surveyId").val()
             const startDate = $("#startDate").val();
             const endDate = $("#endDate").val();
+            const filterBy = $("#filterBy").val();
+
+            const start_date = new Date(`${startDate.substr(3, 2)}/${startDate.substr(0, 2)}/${startDate.substr(6, 4)}`);
+            const start_date_formatted = start_date.toLocaleDateString("en-US");
+
+            const end_date = new Date(`${endDate.substr(3, 2)}/${endDate.substr(0, 2)}/${endDate.substr(6, 4)}`);
+            const end_date_formatted = end_date.toLocaleDateString("en-US");
 
             if (surveyId) {
                 $.ajax({
-                    "url": `/Survey/SurveyReportDetailed?surveyId=${surveyId}&startDate=${startDate}&endDate=${endDate}`,
+                    "url": `/Survey/SurveyReportDetailed?surveyId=${surveyId}&startDate=${start_date_formatted}&endDate=${end_date_formatted}&filterBy=${filterBy}`,
                     "type": "POST",
                     "success": async function (response) {
                         if (response.result === "200") {
@@ -195,8 +231,15 @@
             const surveyID = @ViewBag.SurveyId;
             const startDate = $("#startDate").val();
             const endDate = $("#endDate").val();
+            const filterBy = $("#filterBy").val();
 
-            window.location = `/survey/CompletedSurveys/${surveyID}?startDate=${startDate}&endDate=${endDate}`;
+            const start_date = new Date(`${startDate.substr(3, 2)}/${startDate.substr(0, 2)}/${startDate.substr(6, 4)}`);
+            const start_date_formatted = start_date.toLocaleDateString("en-US");
+
+            const end_date = new Date(`${endDate.substr(3, 2)}/${endDate.substr(0, 2)}/${endDate.substr(6, 4)}`);
+            const end_date_formatted = end_date.toLocaleDateString("en-US");
+
+            window.location = `/survey/CompletedSurveys/${surveyID}?startDate=${start_date_formatted}&endDate=${end_date_formatted}&filterBy=${filterBy}`;
         })
 
         //Replace Previous -> Anterior

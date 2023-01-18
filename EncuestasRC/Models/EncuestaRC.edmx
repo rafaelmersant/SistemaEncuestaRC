@@ -90,6 +90,8 @@
           <Property Name="SurveyEnded" Type="datetime" />
           <Property Name="UserLogged" Type="varchar" MaxLength="50" />
           <Property Name="Comments" Type="varchar" MaxLength="500" />
+          <Property Name="DeliveryDate" Type="datetime" />
+          <Property Name="CloseDate" Type="datetime" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -122,10 +124,10 @@
           <EntitySet Name="QuestionTypes" EntityType="EncuestaRCModel.QuestionType" />
           <EntitySet Name="Answers" EntityType="EncuestaRCModel.Answer" />
           <EntitySet Name="Questions" EntityType="EncuestaRCModel.Question" />
-          <EntitySet Name="Surveys" EntityType="EncuestaRCModel.Survey" />
           <EntitySet Name="SurveyDetails" EntityType="EncuestaRCModel.SurveyDetail" />
           <EntitySet Name="Users" EntityType="EncuestaRCModel.User" />
           <EntitySet Name="SurveyHeaders" EntityType="EncuestaRCModel.SurveyHeader" />
+          <EntitySet Name="Surveys" EntityType="EncuestaRCModel.Survey" />
         </EntityContainer>
         <EntityType Name="LoginHistory">
           <Key>
@@ -174,21 +176,6 @@
           <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
           <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="Survey">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Title" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="SurveyYear" Type="Int32" Nullable="false" />
-          <Property Name="SurveyMonth" Type="Int32" Nullable="false" />
-          <Property Name="Comments" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="CreateBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-        </EntityType>
         <EntityType Name="SurveyDetail">
           <Key>
             <PropertyRef Name="Id" />
@@ -224,6 +211,23 @@
           <Property Name="SurveyEnded" Type="DateTime" Precision="3" />
           <Property Name="UserLogged" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Comments" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="DeliveryDate" Type="DateTime" Precision="3" />
+          <Property Name="CloseDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="Survey">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="SurveyYear" Type="Int32" Nullable="false" />
+          <Property Name="SurveyMonth" Type="Int32" Nullable="false" />
+          <Property Name="Comments" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CreateBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -282,22 +286,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Surveys">
-            <EntityTypeMapping TypeName="EncuestaRCModel.Survey">
-              <MappingFragment StoreEntitySet="Survey">
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
-                <ScalarProperty Name="CreateBy" ColumnName="CreateBy" />
-                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Comments" ColumnName="Comments" />
-                <ScalarProperty Name="SurveyMonth" ColumnName="SurveyMonth" />
-                <ScalarProperty Name="SurveyYear" ColumnName="SurveyYear" />
-                <ScalarProperty Name="Title" ColumnName="Title" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="SurveyDetails">
             <EntityTypeMapping TypeName="EncuestaRCModel.SurveyDetail">
               <MappingFragment StoreEntitySet="SurveyDetail">
@@ -326,6 +314,8 @@
           <EntitySetMapping Name="SurveyHeaders">
             <EntityTypeMapping TypeName="EncuestaRCModel.SurveyHeader">
               <MappingFragment StoreEntitySet="SurveyHeader">
+                <ScalarProperty Name="CloseDate" ColumnName="CloseDate" />
+                <ScalarProperty Name="DeliveryDate" ColumnName="DeliveryDate" />
                 <ScalarProperty Name="Comments" ColumnName="Comments" />
                 <ScalarProperty Name="UserLogged" ColumnName="UserLogged" />
                 <ScalarProperty Name="SurveyEnded" ColumnName="SurveyEnded" />
@@ -333,6 +323,22 @@
                 <ScalarProperty Name="CustomerType" ColumnName="CustomerType" />
                 <ScalarProperty Name="Customer" ColumnName="Customer" />
                 <ScalarProperty Name="SurveyId" ColumnName="SurveyId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Surveys">
+            <EntityTypeMapping TypeName="EncuestaRCModel.Survey">
+              <MappingFragment StoreEntitySet="Survey">
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CreateBy" ColumnName="CreateBy" />
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Comments" ColumnName="Comments" />
+                <ScalarProperty Name="SurveyMonth" ColumnName="SurveyMonth" />
+                <ScalarProperty Name="SurveyYear" ColumnName="SurveyYear" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

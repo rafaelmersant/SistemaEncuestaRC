@@ -31,6 +31,50 @@ namespace EncuestasRC.Controllers
         // GET: Survey
         public ActionResult Index()
         {
+            //try
+            //{
+            //    using(var db = new EncuestaRCEntities())
+            //    {
+            //        var orders = db.SurveyHeaders.ToList();
+
+            //        foreach(var item in orders)
+            //        {
+            //            DataSet customerNameData = Helper.GetCustomerName(item.OrderNo);
+
+            //            if (customerNameData != null && customerNameData.Tables.Count > 0 && customerNameData.Tables[0].Rows.Count > 0)
+            //            {
+            //                DateTime? deliveryDate = null;
+            //                if (customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
+            //                {
+            //                    int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
+            //                    int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
+            //                    int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
+
+            //                    deliveryDate = new DateTime(year, month, day);
+            //                }
+
+            //                DateTime? closeDate = null;
+            //                if (customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Length >= 8)
+            //                {
+            //                    int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(0, 4));
+            //                    int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(4, 2));
+            //                    int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(6, 2));
+
+            //                    closeDate = new DateTime(year, month, day);
+            //                }
+
+            //                item.DeliveryDate = deliveryDate;
+            //                item.CloseDate = closeDate;
+            //                db.SaveChanges();
+            //            }
+            //        }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Helper.SendException(ex, "order:");
+            //}
+
             if (Session["role"] == null) return RedirectToAction("Index", "Home");
             //if (Session["role"].ToString() != "Admin") return RedirectToAction("Index", "Home");
 
@@ -74,7 +118,7 @@ namespace EncuestasRC.Controllers
             return View();
         }
 
-        public ActionResult CompletedSurveys(int? id, DateTime? startDate = null, DateTime? endDate = null)
+        public ActionResult CompletedSurveys(int? id, DateTime? startDate = null, DateTime? endDate = null, int filterBy = 1)
         {
             try
             {
@@ -87,10 +131,20 @@ namespace EncuestasRC.Controllers
                     startDate = startDate == null ? DateTime.Today.AddDays(-30) : startDate;
                     endDate = endDate == null ? DateTime.Today : endDate;
     
-                    var surveysHeader = db.SurveyHeaders.Where(s => s.SurveyId == id && s.SurveyEnded >= startDate && s.SurveyEnded <= endDate).OrderByDescending(o => o.SurveyEnded).ToList();
+                    var surveysHeader = db.SurveyHeaders.Where(s => s.SurveyId == id).ToList();
+
+                    if (filterBy == 1) //By CreationDate
+                        surveysHeader = surveysHeader.Where(s => s.SurveyEnded >= startDate && s.SurveyEnded <= endDate).OrderByDescending(o => o.SurveyEnded).ToList();
+
+                    if (filterBy == 2) //By DeliveryDate
+                        surveysHeader = surveysHeader.Where(s => s.DeliveryDate >= startDate && s.DeliveryDate <= endDate).OrderByDescending(o => o.DeliveryDate).ToList();
+
+                    if (filterBy == 3) //By CloseDate
+                        surveysHeader = surveysHeader.Where(s => s.CloseDate >= startDate && s.CloseDate <= endDate).OrderByDescending(o => o.CloseDate).ToList();
 
                     ViewBag.SurveyTitle = db.Surveys.FirstOrDefault(s => s.Id == id).Title;
                     ViewBag.SurveyId = id;
+                    ViewBag.FilterBy = filterBy;
 
                     foreach(var item in surveysHeader)
                     {
@@ -101,12 +155,14 @@ namespace EncuestasRC.Controllers
                             Customer = item.Customer,
                             CustomerType = item.CustomerType,
                             OrderNo = item.OrderNo,
-                            Result = GetSurveyResultByOne(id.Value, item.Id)
+                            Result = GetSurveyResultByOne(id.Value, item.Id),
+                            DeliveryDate = item.DeliveryDate,
+                            CloseDate = item.CloseDate
                         });
                     }
 
-                    ViewBag.startDate = startDate == null ? DateTime.Today.ToShortDateString() : startDate.Value.ToShortDateString();
-                    ViewBag.endDate = endDate == null ? DateTime.Today.ToShortDateString() : endDate.Value.ToShortDateString();
+                    ViewBag.startDate = startDate == null ? DateTime.Today.ToString("dd/MM/yyyy") : startDate.Value.ToString("dd/MM/yyyy");
+                    ViewBag.endDate = endDate == null ? DateTime.Today.ToString("dd/MM/yyyy") : endDate.Value.ToString("dd/MM/yyyy");
 
                     return View(surveyList);
                 }
@@ -289,8 +345,33 @@ namespace EncuestasRC.Controllers
             {
                 if (customerNameData.Tables.Count > 0 && customerNameData.Tables[0].Rows.Count > 0)
                 {
+                    DateTime? deliveryDate = null;
+                    if (customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
+                    {
+                        int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
+                        int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
+                        int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
+
+                        deliveryDate = new DateTime(year, month, day);
+                    }
+
+                    DateTime? closeDate = null;
+                    if (customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Length >= 8)
+                    {
+                        int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(0, 4));
+                        int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(4, 2));
+                        int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(6, 2));
+
+                        closeDate = new DateTime(year, month, day);
+                    }
+
                     return Json(new { result = "200", 
-                        message = $"{customerNameData.Tables[0].Rows[0].ItemArray[0]}-{customerNameData.Tables[0].Rows[0].ItemArray[3]}-{customerNameData.Tables[0].Rows[0].ItemArray[4]}"});
+                        message = $"{customerNameData.Tables[0].Rows[0].ItemArray[0]}-" +
+                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[3]}-" +
+                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[4]}-" +
+                                  $"{deliveryDate?.ToString("dd/MM/yyyy")}-" +
+                                  $"{closeDate?.ToString("dd/MM/yyyy")}"
+                    });
                 }
             }
             catch (Exception ex)
@@ -749,7 +830,7 @@ namespace EncuestasRC.Controllers
         }
 
         [HttpPost]
-        public JsonResult SurveyReportDetailed(int surveyId, DateTime startDate, DateTime endDate)
+        public JsonResult SurveyReportDetailed(int surveyId, DateTime startDate, DateTime endDate, int filterBy)
         {
             string detailed = "<table width='100%' border=1>";
 
@@ -761,7 +842,7 @@ namespace EncuestasRC.Controllers
                                    join d in db.SurveyDetails on h.Id equals d.SurveyHeaderId
                                    join q in db.Questions on d.QuestionId equals q.Id
                                    join a in db.Answers on d.AnswerId equals a.Id
-                                   where h.SurveyId == surveyId && h.SurveyEnded >= startDate && h.SurveyEnded <= endDate
+                                   where h.SurveyId == surveyId
                                    orderby d.SurveyHeaderId, d.QuestionId
                                    select new
                                    {
@@ -775,9 +856,20 @@ namespace EncuestasRC.Controllers
                                        questionTitle = q.Title,
                                        d.AnswerId,
                                        answerTitle = a.Title,
-                                       date = h.SurveyEnded
+                                       date = h.SurveyEnded,
+                                       h.DeliveryDate,
+                                       h.CloseDate
                                    }).ToArray();
 
+                    if (filterBy == 1) //By CreationDate
+                        details = details.Where(d => d.date >= startDate && d.date <= endDate).ToArray();
+
+                    if (filterBy == 2) //By DeliveryDate
+                        details = details.Where(d => d.DeliveryDate >= startDate && d.DeliveryDate <= endDate).ToArray();
+                        
+                    if (filterBy == 3) //By CloseDate
+                        details = details.Where(d => d.CloseDate >= startDate && d.CloseDate <= endDate).ToArray();
+                    
                     var questions = db.Questions.Where(q => q.SurveyId == surveyId).OrderBy(o => o.SortIndex).ToArray();
                     
                     //HEADER for table
@@ -785,7 +877,10 @@ namespace EncuestasRC.Controllers
                     detailed += "<td><b>Nombre del Cliente</b></td>";
                     detailed += "<td><b>Tipo de Cliente</b></td>";
                     detailed += "<td><b>Orden No.</b></td>";
-                    detailed += "<td><b>Fecha</b></td>";
+                    detailed += "<td><b>Fecha de Creación</b></td>";
+                    detailed += "<td><b>Fecha de Entrega</b></td>";
+                    detailed += "<td><b>Fecha de Cierre</b></td>";
+                    //detailed += "<td><b>Hora</b></td>";
                     detailed += "<td><b>Resultado %</b></td>";
 
                     foreach (var question in questions)
@@ -814,7 +909,10 @@ namespace EncuestasRC.Controllers
                                 detailed += "<td>" + detail.Customer + "</td>";
                                 detailed += "<td>" + GetCustomerType(detail.CustomerType) + "</td>";
                                 detailed += "<td>" + detail.OrderNo + "</td>";
-                                detailed += "<td>" + detail.date + "</td>";
+                                detailed += "<td>" + detail.date.Value.ToString("dd/MM/yyyy") + "</td>";
+                                detailed += "<td>" + detail.DeliveryDate?.ToString("dd/MM/yyyy") + "</td>";
+                                detailed += "<td>" + detail.CloseDate?.ToString("dd/MM/yyyy") + "</td>";
+                                //detailed += "<td>" + detail.date.Value.ToString("hh:mm t") + "</td>";
                                 detailed += "<td>" + GetSurveyResultByOne(detail.SurveyId, detail.Id) + "</td>";
                             }
                             

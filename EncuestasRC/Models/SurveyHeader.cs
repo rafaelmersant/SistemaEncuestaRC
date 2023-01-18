@@ -22,5 +22,7 @@ namespace EncuestasRC.Models
         public Nullable<System.DateTime> SurveyEnded { get; set; }
         public string UserLogged { get; set; }
         public string Comments { get; set; }
+        public Nullable<System.DateTime> DeliveryDate { get; set; }
+        public Nullable<System.DateTime> CloseDate { get; set; }
     }
 }

@@ -39,5 +39,7 @@ namespace EncuestasRC.ViewModels
         public int? CustomerType { get; set; }
         public string OrderNo { get; set; }
         public decimal? Result { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+        public DateTime? CloseDate { get; set; }
     }
 }

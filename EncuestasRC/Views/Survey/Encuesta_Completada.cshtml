@@ -15,23 +15,24 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="form-row">
-                <div class="col-1">
+                <div class="col-2">
                     <label class="col-form-label col-form-label-sm">Fecha</label>
                 </div>
 
                 <div class="col-2">
-                    <input type="text" id="surveyDate" name="surveyDate" value="@Model.surveyHeader.SurveyEnded.Value.Date.ToString("MM/dd/yyyy")" class="datepicker form-control form-control-sm" autocomplete="off" readonly />
+                    <input type="text" id="surveyDate" name="surveyDate" value="@Model.surveyHeader.SurveyEnded.Value.Date.ToString("dd/MM/yyyy")" class="datepicker form-control form-control-sm" autocomplete="off" readonly />
                 </div>
             </div>
         </div>
 
         <div class="col-12 mt-1">
-            <div class="form-row">
-                <div class="col-1">
+            <div class="form-row align-items-center">
+                <div class="col-2">
                     <label class="col-form-label col-form-label-sm">Orden</label>
                 </div>
                 <div class="col-2">
-                    <input type="text" id="orderNo" name="orderNo" value="@Model.surveyHeader.OrderNo" class="form-control form-control-sm" autocomplete="off" />
+                    <input autocomplete="off" class="form-control form-control-sm" id="orderNo" name="orderNo" placeholder="Orden No." type="text" value="@Model.surveyHeader.OrderNo.Split('-')[0]" />
+                    <input autocomplete="off" class="form-control form-control-sm" id="orderType" name="orderType" placeholder="Tipo de Orden" type="text" value="@Model.surveyHeader.OrderNo.Split('-')[1]" />
                 </div>
                 <div class="col-1">
                     <a class="btn btn-sm btn-info" href="javascript:void(0)" id="btnSearchOrder" title="Buscar" style="margin-top: 1px">
@@ -43,7 +44,7 @@
 
         <div class="col-12 mt-1">
             <div class="form-row">
-                <div class="col-1">
+                <div class="col-2">
                     <label class="col-form-label col-form-label-sm">Cliente</label>
                 </div>
 
@@ -55,7 +56,7 @@
 
         <div class="col-12 mt-1">
             <div class="form-row">
-                <div class="col-1">
+                <div class="col-2">
                     <label class="col-form-label col-form-label-sm">Tipo</label>
                 </div>
                 <div class="col-2">
@@ -67,6 +68,30 @@
                         <option value="4">Esporádico</option>
                         <option value="5">Centro de Servicios</option>
                     </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-1">
+            <div class="form-row">
+                <div class="col-2">
+                    <label class="col-form-label col-form-label-sm">Fecha de Entrega</label>
+                </div>
+
+                <div class="col-2">
+                    <input type="text" id="dateDelivery" name="dateDelivery" value="@Model.surveyHeader.DeliveryDate.Value.ToString("dd/MM/yyyy")" class="form-control form-control-sm" autocomplete="off" disabled />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="form-row">
+                <div class="col-2">
+                    <label class="col-form-label col-form-label-sm">Fecha de Cierre</label>
+                </div>
+
+                <div class="col-2">
+                    <input type="text" id="dateClose" name="dateClose" value="@Model.surveyHeader.CloseDate.Value.ToString("dd/MM/yyyy")" class="form-control form-control-sm" autocomplete="off" disabled />
                 </div>
             </div>
         </div>
@@ -234,8 +259,10 @@
 
         $("#btnSearchOrder").click(function (e) {
             e.preventDefault();
-            console.log('searching')
-            const order = $("#orderNo").val();
+            let order = $("#orderNo").val();
+            const orderType = $("#orderType").val();
+
+            order = `${order}-${orderType}`;
 
             if (order) {
                 $.ajax({

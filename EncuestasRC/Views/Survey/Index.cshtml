@@ -89,7 +89,7 @@
                     <span>@item.Result%</span>
                     }
             </td>
-            <td>@item.CreateDate</td>
+            <td>@item.CreateDate.ToString("dd/MM/yyyy")</td>
 
             <td align="center">
                 <a class="btn btn-sm btn-warning" href="@Url.Action("Reporte_Encuesta",new { id = @item.Id })" title="Reporte de encuesta">
