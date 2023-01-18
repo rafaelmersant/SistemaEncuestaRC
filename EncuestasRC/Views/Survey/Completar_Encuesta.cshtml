@@ -186,11 +186,11 @@
 
     const saveSurvey = (id, surveyId, customer, customerType, orderNo, date, comments, deliveryDate, closeDate) => {
         const formattedDate = GetDateFormat(date);
-        const deliveryDateFormatted = GetDateFormat(deliveryDate);
-        const closeDateFormatted = GetDateFormat(closeDate);
+        const deliveryDateFormatted = deliveryDate ? GetDateFormat(deliveryDate) : null;
+        const closeDateFormatted = closeDate ? GetDateFormat(closeDate) : null;
 
         const url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&customerType=${customerType}&orderNo=${orderNo}&date=${formattedDate}&comments=${comments}&deliveryDate=${deliveryDateFormatted}&closeDate=${closeDateFormatted}`;
-
+        
         $.ajax({
             "url": url,
             "type": "POST",
@@ -308,7 +308,7 @@
                             $("#customer").val(response.message);
 
                             if (response.result === "200") {
-                                console.log('result:', response.message)
+                                console.log('result:', response)
                                 const results = response.message.split("-");
 
                                 $("#customer").val(results[0]);
