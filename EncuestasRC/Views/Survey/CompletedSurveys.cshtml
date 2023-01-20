@@ -27,8 +27,8 @@
                 <div class="col-2">
                     <select class="form-control form-control-sm" id="filterBy">
                         <option value="1">Fecha de Creación</option>
-                        <option value="2">Fecha de Entrega</option>
                         <option value="3">Fecha de Cierre</option>
+                        <option value="2">Fecha de Entrega</option>
                     </select>
                 </div>
             </div>
@@ -83,10 +83,10 @@
                     Orden
                 </th>
                 <th>
-                    Fecha de Entrega
+                    Fecha de Cierre
                 </th>
                 <th>
-                    Fecha de Cierre
+                    Fecha de Entrega
                 </th>
                 <th class="text-center">
                     Resultado
@@ -138,8 +138,8 @@
                     }
                 </td>
                 <td>@item.OrderNo</td>
-                <td>@(item.DeliveryDate?.Date.ToString("dd/MM/yyyy"))</td>
                 <td>@(item.CloseDate?.Date.ToString("dd/MM/yyyy"))</td>
+                <td>@(item.DeliveryDate?.Date.ToString("dd/MM/yyyy"))</td>
                 <td class="text-center">@item.Result%</td>
 
                 <td align="center">

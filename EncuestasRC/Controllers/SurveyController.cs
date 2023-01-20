@@ -33,32 +33,32 @@ namespace EncuestasRC.Controllers
         {
             //try
             //{
-            //    using(var db = new EncuestaRCEntities())
+            //    using (var db = new EncuestaRCEntities())
             //    {
             //        var orders = db.SurveyHeaders.ToList();
 
-            //        foreach(var item in orders)
+            //        foreach (var item in orders)
             //        {
             //            DataSet customerNameData = Helper.GetCustomerName(item.OrderNo);
 
             //            if (customerNameData != null && customerNameData.Tables.Count > 0 && customerNameData.Tables[0].Rows.Count > 0)
             //            {
             //                DateTime? deliveryDate = null;
-            //                if (customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
-            //                {
-            //                    int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
-            //                    int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
-            //                    int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
-
-            //                    deliveryDate = new DateTime(year, month, day);
-            //                }
-
-            //                DateTime? closeDate = null;
             //                if (customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Length >= 8)
             //                {
             //                    int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(0, 4));
             //                    int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(4, 2));
             //                    int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(6, 2));
+
+            //                    deliveryDate = new DateTime(year, month, day);
+            //                }
+
+            //                DateTime? closeDate = null;
+            //                if (customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
+            //                {
+            //                    int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
+            //                    int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
+            //                    int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
 
             //                    closeDate = new DateTime(year, month, day);
             //                }
@@ -878,8 +878,8 @@ namespace EncuestasRC.Controllers
                     detailed += "<td><b>Tipo de Cliente</b></td>";
                     detailed += "<td><b>Orden No.</b></td>";
                     detailed += "<td><b>Fecha de Creación</b></td>";
-                    detailed += "<td><b>Fecha de Entrega</b></td>";
                     detailed += "<td><b>Fecha de Cierre</b></td>";
+                    detailed += "<td><b>Fecha de Entrega</b></td>";
                     //detailed += "<td><b>Hora</b></td>";
                     detailed += "<td><b>Resultado %</b></td>";
 
@@ -910,8 +910,8 @@ namespace EncuestasRC.Controllers
                                 detailed += "<td>" + GetCustomerType(detail.CustomerType) + "</td>";
                                 detailed += "<td>" + detail.OrderNo + "</td>";
                                 detailed += "<td>" + detail.date.Value.ToString("dd/MM/yyyy") + "</td>";
-                                detailed += "<td>" + detail.DeliveryDate?.ToString("dd/MM/yyyy") + "</td>";
                                 detailed += "<td>" + detail.CloseDate?.ToString("dd/MM/yyyy") + "</td>";
+                                detailed += "<td>" + detail.DeliveryDate?.ToString("dd/MM/yyyy") + "</td>";
                                 //detailed += "<td>" + detail.date.Value.ToString("hh:mm t") + "</td>";
                                 detailed += "<td>" + GetSurveyResultByOne(detail.SurveyId, detail.Id) + "</td>";
                             }
