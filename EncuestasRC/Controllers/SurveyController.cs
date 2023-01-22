@@ -843,7 +843,7 @@ namespace EncuestasRC.Controllers
                                    join q in db.Questions on d.QuestionId equals q.Id
                                    join a in db.Answers on d.AnswerId equals a.Id
                                    where h.SurveyId == surveyId
-                                   orderby d.SurveyHeaderId, d.QuestionId
+                                   orderby d.SurveyHeaderId, q.SortIndex
                                    select new
                                    {
                                        h.Id,
@@ -862,13 +862,13 @@ namespace EncuestasRC.Controllers
                                    }).ToArray();
 
                     if (filterBy == 1) //By CreationDate
-                        details = details.Where(d => d.date >= startDate && d.date <= endDate).ToArray();
+                        details = details.Where(d => d.date.Value.Date >= startDate && d.date.Value.Date <= endDate).ToArray();
 
                     if (filterBy == 2) //By DeliveryDate
-                        details = details.Where(d => d.DeliveryDate >= startDate && d.DeliveryDate <= endDate).ToArray();
+                        details = details.Where(d => d.DeliveryDate.Value.Date >= startDate && d.DeliveryDate.Value.Date <= endDate).ToArray();
                         
                     if (filterBy == 3) //By CloseDate
-                        details = details.Where(d => d.CloseDate >= startDate && d.CloseDate <= endDate).ToArray();
+                        details = details.Where(d => d.CloseDate.Value.Date >= startDate && d.CloseDate.Value.Date <= endDate).ToArray();
                     
                     var questions = db.Questions.Where(q => q.SurveyId == surveyId).OrderBy(o => o.SortIndex).ToArray();
                     
@@ -895,15 +895,15 @@ namespace EncuestasRC.Controllers
                     detailed += "</tr>";
 
                     //BODY for table
-                    int index = 1;
+                    int index = 0;
 
                     foreach (var detail in details)
                     {
-                        if (index == 1) detailed += "<tr>";
+                        if (index == 0) detailed += "<tr>";
 
                         foreach (var question in questions.Where(q => q.Id == detail.QuestionId))
                         {
-                            if (index == 1)
+                            if (index == 0)
                             {
 
                                 detailed += "<td>" + detail.Customer + "</td>";
@@ -921,15 +921,20 @@ namespace EncuestasRC.Controllers
                             var answers = db.Answers.Where(a => a.QuestionId == question.Id);
                             foreach (var answer in answers)
                             {
-                                var selectedAnswer = answer.Id == detail.AnswerId && question.Id == detail.QuestionId ? "<span>X<span>" : "";
+                                //var selectedAnswer = answer.Id == detail.AnswerId && question.Id == detail.QuestionId ? "<span>X<span>" : "";
+                                var selectedAnswer = answer.Id == detail.AnswerId ? "<span>X<span>" : "";
                                 detailed += "<td style='text-align:center'>" + selectedAnswer + "</td>";
                             }
                         }
 
-                        index = index == questions.Count() ? index = 1 : index + 1;
+                        if (index == questions.Count() - 1)
+                        {
+                            index = 0;
+                            detailed += "</tr>";
+                        }
+                        else
+                            index++;
                     }
-
-                    detailed += "</tr>";
 
                     detailed += "</table>";
                 }
