@@ -88,7 +88,7 @@
                     <label class="col-form-label col-form-label-sm">Tipo</label>
                 </div>
                 <div class="col-2">
-                    <select id="customerType" name="customerType" class="form-control form-control-sm">
+                    <select id="customerType" name="customerType" class="form-control form-control-sm" style="min-width: 280px">
                         <option value="0">--Seleccionar--</option>
                         <option value="1">Minorista</option>
                         <option value="2">Mayorista</option>
@@ -184,12 +184,12 @@
 
 <script type="text/javascript">
 
-    const saveSurvey = (id, surveyId, customer, customerType, orderNo, date, comments, deliveryDate, closeDate) => {
+    const saveSurvey = (id, surveyId, customer, customerType, orderNo, date, comments, closeDate, deliveryDate) => {
         const formattedDate = GetDateFormat(date);
         const deliveryDateFormatted = deliveryDate ? GetDateFormat(deliveryDate) : null;
         const closeDateFormatted = closeDate ? GetDateFormat(closeDate) : null;
 
-        const url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&customerType=${customerType}&orderNo=${orderNo}&date=${formattedDate}&comments=${comments}&deliveryDate=${deliveryDateFormatted}&closeDate=${closeDateFormatted}`;
+        const url = `/Survey/SaveSurveyHeader?id=${id}&surveyId=${surveyId}&customer=${customer}&customerType=${customerType}&orderNo=${orderNo}&date=${formattedDate}&comments=${comments}&closeDate=${closeDateFormatted}&deliveryDate=${deliveryDateFormatted}`;
         
         $.ajax({
             "url": url,
@@ -205,10 +205,8 @@
                             const questionId = $(`input[name='question${index}']:checked`).attr("id")
                             const answerId = $(`input[name='question${index}']:checked`).attr("value")
                             const points = $(`input[name='question${index}']:checked`).attr("data-bind")
-                            const deliveryDate = $("#deliveryDate").val();
-                            const closeDate = $("#closeDate").val();
-
-                            await saveSurveyDetail(surveyHeaderId, questionId, answerId, points, deliveryDate, closeDate);
+                            
+                            await saveSurveyDetail(surveyHeaderId, questionId, answerId, points);
 
                             $("#surveyDiv :input[type=text]").prop("disabled", true);
                             $("#customerType").prop("disabled", true);
@@ -303,13 +301,15 @@
                     "url": `/Survey/CustomerNameForOrder?order=${order}`,
                     "type": "POST",
                     "success": async function (response) {
+                        console.log('response:', response);
+
                         if (response.result === "200" || response.result === "404") {
 
                             $("#customer").val(response.message);
 
                             if (response.result === "200") {
                                 console.log('result:', response)
-                                const results = response.message.split("-");
+                                const results = response.message.split("|");
 
                                 $("#customer").val(results[0]);
                                 $("#orderType").val(`${results[1]}`);
@@ -344,10 +344,15 @@
             const customer = $("#customer").val()
             const customerType = $("#customerType").val()
             const orderNo = $("#orderNo").val()
+            const orderType = $("#orderType").val()
             const date = $(".datepicker").val()
             const comments = $("#comments").val()
 
-            await saveSurvey(id, surveyId, customer, customerType, orderNo, date, comments);
+            const closeDate = $("#closeDate").val()
+            const deliveryDate = $("#deliveryDate").val()
+
+            const orderNoType = `${orderNo}-${orderType}`;
+            await saveSurvey(id, surveyId, customer, customerType, orderNoType, date, comments, closeDate, deliveryDate);
         });
 
     });

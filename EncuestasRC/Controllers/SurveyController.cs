@@ -43,28 +43,31 @@ namespace EncuestasRC.Controllers
 
             //            if (customerNameData != null && customerNameData.Tables.Count > 0 && customerNameData.Tables[0].Rows.Count > 0)
             //            {
-            //                DateTime? deliveryDate = null;
-            //                if (customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Length >= 8)
-            //                {
-            //                    int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(0, 4));
-            //                    int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(4, 2));
-            //                    int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(6, 2));
-
-            //                    deliveryDate = new DateTime(year, month, day);
-            //                }
-
             //                DateTime? closeDate = null;
-            //                if (customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
+            //                if (customerNameData.Tables[0].Rows[0].ItemArray[3].ToString().Length >= 8)
             //                {
-            //                    int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
-            //                    int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
-            //                    int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
+            //                    int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[3].ToString().Substring(0, 4));
+            //                    int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[3].ToString().Substring(4, 2));
+            //                    int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[3].ToString().Substring(6, 2));
 
             //                    closeDate = new DateTime(year, month, day);
             //                }
 
+            //                DateTime? deliveryDate = null;
+            //                if (customerNameData.Tables[0].Rows[0].ItemArray[4].ToString().Length >= 8)
+            //                {
+            //                    int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[4].ToString().Substring(0, 4));
+            //                    int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[4].ToString().Substring(4, 2));
+            //                    int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[4].ToString().Substring(6, 2));
+
+            //                    deliveryDate = new DateTime(year, month, day);
+            //                }
+
             //                item.DeliveryDate = deliveryDate;
             //                item.CloseDate = closeDate;
+            //                item.OrderNo = customerNameData.Tables[0].Rows[0].ItemArray[2].ToString();
+            //                if (!string.IsNullOrEmpty(customerNameData.Tables[0].Rows[0].ItemArray[1].ToString()))
+            //                    item.OrderNo += "-" + customerNameData.Tables[0].Rows[0].ItemArray[1];
             //                db.SaveChanges();
             //            }
             //        }
@@ -366,10 +369,10 @@ namespace EncuestasRC.Controllers
                     }
 
                     return Json(new { result = "200", 
-                        message = $"{customerNameData.Tables[0].Rows[0].ItemArray[0]}-" +
-                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[1]}-" +
-                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[2]}-" +
-                                  $"{closeDate?.ToString("dd/MM/yyyy")}-" +
+                        message = $"{customerNameData.Tables[0].Rows[0].ItemArray[0].ToString().Trim()}|" +
+                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[1]}|" +
+                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[2]}|" +
+                                  $"{closeDate?.ToString("dd/MM/yyyy")}|" +
                                   $"{deliveryDate?.ToString("dd/MM/yyyy")}"
                     });
                 }
@@ -744,7 +747,7 @@ namespace EncuestasRC.Controllers
 
         //Save Survey Header
         [HttpPost]
-        public JsonResult SaveSurveyHeader(int Id, int surveyId, string customer, int customerType, string orderNo, string date, string comments)
+        public JsonResult SaveSurveyHeader(int Id, int surveyId, string customer, int customerType, string orderNo, string date, string comments, DateTime? closeDate, DateTime? deliveryDate)
         {
             SurveyHeader surveyHeader;
 
@@ -760,6 +763,8 @@ namespace EncuestasRC.Controllers
                         surveyHeader.OrderNo = orderNo;
                         //surveyHeader.SurveyEnded = DateTime.Now;
                         surveyHeader.Comments = comments;
+                        surveyHeader.CloseDate = closeDate;
+                        surveyHeader.DeliveryDate = deliveryDate;
                     }
                     else
                     {
@@ -771,7 +776,9 @@ namespace EncuestasRC.Controllers
                             OrderNo = orderNo,
                             SurveyEnded = Convert.ToDateTime(date),
                             UserLogged = Session["email"] != null ? Session["email"].ToString() : "",
-                            Comments = comments
+                            Comments = comments,
+                            CloseDate = closeDate,
+                            DeliveryDate = deliveryDate
                         };
                         
                         db.SurveyHeaders.Add(surveyHeader);
