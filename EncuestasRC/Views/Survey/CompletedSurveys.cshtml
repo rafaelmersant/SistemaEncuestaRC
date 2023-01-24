@@ -5,12 +5,14 @@
     ViewBag.Title = "Encuestas Completadas";
 }
 
-<div class="mb-4 bg-dark text-light pt-2 pb-2 pl-1 border rounded">
-    <h5 class="panel-title d-inline">
-        Encuestas completadas: @ViewBag.SurveyTitle
-    </h5>
-    <div class="float-right mr-2 d-inline">
-        <button class="btn btn-success" id="exportToExcel" style="height: 34px !important; margin-top: -4px">Exportar a Excel</button>
+<div class="mb-4 bg-dark text-light pt-2 pb-2 pl-1 border rounded d-flex justify-content-between">
+    <div>
+        <h5 class="panel-title">
+            Encuestas completadas: @ViewBag.SurveyTitle
+        </h5>
+    </div>
+    <div class="mr-2">
+        <button class="btn btn-success" id="exportToExcel">Exportar a Excel</button> <span id="loadingexcell" class="spinner-grow" style="display: none"></span>
     </div>
     <input type="hidden" id="surveyId" name="surveyId" value="@ViewBag.SurveyId" />
 </div>
@@ -99,61 +101,61 @@
         <tbody>
             @foreach (var item in Model)
             {
-            <tr>
-                <td>@item.SurveyEnded.Value.Date.ToString("dd/MM/yyyy")</td>
-                <td>
-                    @if (string.IsNullOrEmpty(item.Customer))
-                    {
-                        <span>Anónimo</span>
-                    }
-                    else
-                    {
-                        <span>@item.Customer</span>
-                    }
-                </td>
-                <td>
-                    @if (item.CustomerType == 1)
-                    {
-                        <span>Minorista</span>
-                    }
-                    else if (item.CustomerType == 2)
-                    {
-                        <span>Mayorista</span>
-                    }
-                    else if (item.CustomerType == 3)
-                    {
-                        <span>Clave</span>
-                    }
-                    else if (item.CustomerType == 4)
-                    {
-                        <span>Esporádico</span>
-                    }
-                    else if (item.CustomerType == 5)
-                    {
-                        <span>Centro de Servicios</span>
-                    }
-                    else
-                    {
-                        <span></span>
-                    }
-                </td>
-                <td>@item.OrderNo</td>
-                <td>@(item.CloseDate?.Date.ToString("dd/MM/yyyy"))</td>
-                <td>@(item.DeliveryDate?.Date.ToString("dd/MM/yyyy"))</td>
-                <td class="text-center">@item.Result%</td>
+                <tr>
+                    <td>@item.SurveyEnded.Value.Date.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (string.IsNullOrEmpty(item.Customer))
+                        {
+                            <span>Anónimo</span>
+                        }
+                        else
+                        {
+                            <span>@item.Customer</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.CustomerType == 1)
+                        {
+                            <span>Minorista</span>
+                        }
+                        else if (item.CustomerType == 2)
+                        {
+                            <span>Mayorista</span>
+                        }
+                        else if (item.CustomerType == 3)
+                        {
+                            <span>Clave</span>
+                        }
+                        else if (item.CustomerType == 4)
+                        {
+                            <span>Esporádico</span>
+                        }
+                        else if (item.CustomerType == 5)
+                        {
+                            <span>Centro de Servicios</span>
+                        }
+                        else
+                        {
+                            <span></span>
+                        }
+                    </td>
+                    <td>@item.OrderNo</td>
+                    <td>@(item.CloseDate?.Date.ToString("dd/MM/yyyy"))</td>
+                    <td>@(item.DeliveryDate?.Date.ToString("dd/MM/yyyy"))</td>
+                    <td class="text-center">@item.Result%</td>
 
-                <td align="center">
-                    <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id, resultado = item.Result, main = ViewBag.SurveyId })" title="Ver detalles">
-                        <i class="fa fa-file-text"></i>
-                    </a>
-                </td>
-            </tr>
+                    <td align="center">
+                        <a class="btn btn-sm btn-info" href="@Url.Action("Encuesta_Completada",new { id = @item.Id, resultado = item.Result, main = ViewBag.SurveyId })" title="Ver detalles">
+                            <i class="fa fa-file-text"></i>
+                        </a>
+                    </td>
+                </tr>
             }
         </tbody>
     </table>
 </div>
 
-<link href="~/Content/dataTables.bootstrap4.min.css" rel="stylesheet"/>
+<link href="~/Content/dataTables.bootstrap4.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 @section scripts {
@@ -182,6 +184,7 @@
     }
 
     $(document).ready(function () {
+        $("#loadingexcell").hide();
         $(".datepicker").datepicker({
             dateFormat: "dd/mm/yy"
         });
@@ -195,6 +198,8 @@
 
         $("#exportToExcel").click(function (e) {
             e.preventDefault();
+
+            $("#loadingexcell").show();
 
             const surveyId = $("#surveyId").val()
             const startDate = $("#startDate").val();
@@ -212,15 +217,31 @@
                     "url": `/Survey/SurveyReportDetailed?surveyId=${surveyId}&startDate=${start_date_formatted}&endDate=${end_date_formatted}&filterBy=${filterBy}`,
                     "type": "POST",
                     "success": async function (response) {
-                        if (response.result === "200") {
-
-                            //export to Excel
-                            exportToExcel(response.message)
-
-                        } else {
-                            console.log(response.message);
-                            alert('Hubo un error tratando de consultar la orden.');
+                        if (Object.hasOwn(response, "result")) {
+                            console.log(response);
+                            alert('Hubo un error tratando de exportar el contenido a Excel. Favor intentar con un periodo de fecha más corto.');
                         }
+                        else {
+                            console.log('EXPORTING....');
+                            //export to Excel
+                            exportToExcel(response)
+                        }
+
+                        //if (response.result === "200") {
+                        //    console.log('EXPORTING....');
+                        //    //export to Excel
+                        //    exportToExcel(response.message)
+                        //} else {
+                        //    console.log(response);
+                        //    alert('Hubo un error tratando de exportar el contenido a Excel. Favor intentar con un periodo de fecha más corto.');
+                        //}
+
+                        $("#loadingexcell").hide();
+                    },
+                    "error": function (error) {
+                        console.log('error (export excel):', error);
+
+                        $("#loadingexcell").hide();
                     }
                 });
             }

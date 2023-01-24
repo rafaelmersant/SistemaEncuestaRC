@@ -345,32 +345,32 @@ namespace EncuestasRC.Controllers
             {
                 if (customerNameData.Tables.Count > 0 && customerNameData.Tables[0].Rows.Count > 0)
                 {
-                    DateTime? deliveryDate = null;
-                    if (customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Length >= 8)
-                    {
-                        int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(0, 4));
-                        int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(4, 2));
-                        int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[5].ToString().Substring(6, 2));
-
-                        deliveryDate = new DateTime(year, month, day);
-                    }
-
                     DateTime? closeDate = null;
-                    if (customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Length >= 8)
+                    if (customerNameData.Tables[0].Rows[0].ItemArray[3].ToString().Length >= 8)
                     {
-                        int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(0, 4));
-                        int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(4, 2));
-                        int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[6].ToString().Substring(6, 2));
+                        int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[3].ToString().Substring(0, 4));
+                        int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[3].ToString().Substring(4, 2));
+                        int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[3].ToString().Substring(6, 2));
 
                         closeDate = new DateTime(year, month, day);
                     }
 
+                    DateTime? deliveryDate = null;
+                    if (customerNameData.Tables[0].Rows[0].ItemArray[4].ToString().Length >= 8)
+                    {
+                        int year = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[4].ToString().Substring(0, 4));
+                        int month = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[4].ToString().Substring(4, 2));
+                        int day = int.Parse(customerNameData.Tables[0].Rows[0].ItemArray[4].ToString().Substring(6, 2));
+
+                        deliveryDate = new DateTime(year, month, day);
+                    }
+
                     return Json(new { result = "200", 
                         message = $"{customerNameData.Tables[0].Rows[0].ItemArray[0]}-" +
-                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[3]}-" +
-                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[4]}-" +
-                                  $"{deliveryDate?.ToString("dd/MM/yyyy")}-" +
-                                  $"{closeDate?.ToString("dd/MM/yyyy")}"
+                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[1]}-" +
+                                  $"{customerNameData.Tables[0].Rows[0].ItemArray[2]}-" +
+                                  $"{closeDate?.ToString("dd/MM/yyyy")}-" +
+                                  $"{deliveryDate?.ToString("dd/MM/yyyy")}"
                     });
                 }
             }
@@ -833,6 +833,7 @@ namespace EncuestasRC.Controllers
         public JsonResult SurveyReportDetailed(int surveyId, DateTime startDate, DateTime endDate, int filterBy)
         {
             string detailed = "<table width='100%' border=1>";
+            string surveyHeader = "";
 
             try
             {
@@ -865,10 +866,10 @@ namespace EncuestasRC.Controllers
                         details = details.Where(d => d.date.Value.Date >= startDate && d.date.Value.Date <= endDate).ToArray();
 
                     if (filterBy == 2) //By DeliveryDate
-                        details = details.Where(d => d.DeliveryDate.Value.Date >= startDate && d.DeliveryDate.Value.Date <= endDate).ToArray();
+                        details = details.Where(d => d.DeliveryDate >= startDate && d.DeliveryDate <= endDate).ToArray();
                         
                     if (filterBy == 3) //By CloseDate
-                        details = details.Where(d => d.CloseDate.Value.Date >= startDate && d.CloseDate.Value.Date <= endDate).ToArray();
+                        details = details.Where(d => d.CloseDate >= startDate && d.CloseDate <= endDate).ToArray();
                     
                     var questions = db.Questions.Where(q => q.SurveyId == surveyId).OrderBy(o => o.SortIndex).ToArray();
                     
@@ -903,6 +904,8 @@ namespace EncuestasRC.Controllers
 
                         foreach (var question in questions.Where(q => q.Id == detail.QuestionId))
                         {
+                            surveyHeader = $"surveyHeaderId: {detail.Id} | questionID: {detail.QuestionId}";
+
                             if (index == 0)
                             {
 
@@ -941,17 +944,20 @@ namespace EncuestasRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex, "Encuesta Id:" + surveyId);
+                Helper.SendException(ex, "Encuesta Id:" + surveyId + " detail:" + surveyHeader);
 
                 return Json(new { result = "500", message = ex.Message });
             }
 
-            return Json(new { result = "200", message = detailed });
+            return new JsonResult() { Data = detailed, JsonRequestBehavior = JsonRequestBehavior.AllowGet, MaxJsonLength = Int32.MaxValue };
+
+            //return Json(new { result = "200", message = detailed });
         }
 
         private decimal GetSurveyResult(int surveyId)
         {
             decimal result = 0;
+            string detail = "";
 
             try
             {
@@ -975,6 +981,8 @@ namespace EncuestasRC.Controllers
 
                         foreach (var answer in question.Answers)
                         {
+                            detail = $"surveyID: {surveyId} | questionID: {question.QuestionId} | answer: {answer.Id}";
+
                             var _answer = details.Where(a => a.AnswerId == answer.Id);
                             int answerTotal = _answer.Count();
 
@@ -991,7 +999,7 @@ namespace EncuestasRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex, "Encuesta Id:" + surveyId);
+                Helper.SendException(ex, "More detail:" + detail);
 
                 return 0;
             }
@@ -1002,6 +1010,7 @@ namespace EncuestasRC.Controllers
         public decimal GetSurveyResultByOne(int surveyId, int surveyIdHeader)
         {
             decimal result = 0;
+            string detail = "";
 
             try
             {
@@ -1025,6 +1034,8 @@ namespace EncuestasRC.Controllers
 
                         foreach (var answer in question.Answers)
                         {
+                            detail = $"surveyID: {surveyId} | surveyHeaderID: {surveyIdHeader} | questionID: {question.QuestionId} | answer: {answer.Id}";
+
                             var _answer = details.Where(a => a.AnswerId == answer.Id);
                             int answerTotal = _answer.Count();
 
@@ -1041,7 +1052,7 @@ namespace EncuestasRC.Controllers
             }
             catch (Exception ex)
             {
-                Helper.SendException(ex, "Encuesta Id:" + surveyId);
+                Helper.SendException(ex, "More detail:" + detail);
 
                 return 0;
             }
@@ -1051,11 +1062,12 @@ namespace EncuestasRC.Controllers
 
         private string GetCustomerType(int? id)
         {
-            if (id == null || id == 0) return "";
+            //if (id == null || id == 0) return "";
             if (id == 1) return "Minorista";
             if (id == 2) return "Mayorista";
             if (id == 3) return "Clave";
             if (id == 4) return "Esporádico";
+            if (id == 5) return "Centro de Servicios";
 
             return "";
         }

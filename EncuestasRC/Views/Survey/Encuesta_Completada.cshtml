@@ -3,6 +3,15 @@
 @{
     var index = 0;
     ViewBag.Title = "Encuesta Completada";
+
+    var orderNo = "";
+    var orderType = "";
+
+    if (Model.surveyHeader.OrderNo.Split('-').Length > 1)
+    {
+        orderNo = Model.surveyHeader.OrderNo.Split('-')[0];
+        orderType = Model.surveyHeader.OrderNo.Split('-')[1];
+    }
 }
 
 <div class="text-center">
@@ -31,8 +40,8 @@
                     <label class="col-form-label col-form-label-sm">Orden</label>
                 </div>
                 <div class="col-2">
-                    <input autocomplete="off" class="form-control form-control-sm" id="orderNo" name="orderNo" placeholder="Orden No." type="text" value="@Model.surveyHeader.OrderNo.Split('-')[0]" />
-                    <input autocomplete="off" class="form-control form-control-sm" id="orderType" name="orderType" placeholder="Tipo de Orden" type="text" value="@Model.surveyHeader.OrderNo.Split('-')[1]" />
+                    <input autocomplete="off" class="form-control form-control-sm" id="orderNo" name="orderNo" placeholder="Orden No." type="text" value="@orderNo" />
+                    <input autocomplete="off" class="form-control form-control-sm" id="orderType" name="orderType" placeholder="Tipo de Orden" type="text" value="@orderType" />
                 </div>
                 <div class="col-1">
                     <a class="btn btn-sm btn-info" href="javascript:void(0)" id="btnSearchOrder" title="Buscar" style="margin-top: 1px">
@@ -277,7 +286,10 @@
                                 const results = response.message.split("-");
 
                                 $("#customer").val(results[0]);
-                                $("#orderNo").val(`${results[2]}-${results[1]}`);
+                                $("#orderType").val(`${results[1]}`);
+                                $("#orderNo").val(`${results[2]}`);
+                                $("#closeDate").val(`${results[3]}`);
+                                $("#deliveryDate").val(`${results[4]}`);
                             }
                         } else {
                             console.log(response.message);
